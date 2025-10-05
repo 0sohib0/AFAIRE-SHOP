@@ -1,0 +1,110 @@
+/* admin.css */
+body {
+    background-color: #1f2937; /* خلفية داكنة للوحة التحكم */
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    direction: rtl;
+    text-align: right;
+    padding-top: 60px; /* مسافة لرأس الصفحة */
+}
+
+header {
+    background-color: #111827;
+    padding: 15px 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+header h1 { font-size: 1.5em; }
+#auth-controls button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #3b82f6;
+    color: white;
+}
+
+main { padding: 30px; }
+.stats-bar {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #374151;
+    border-radius: 8px;
+}
+.stats-bar strong { color: #facc15; }
+
+/* تنسيق الجدول */
+#orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #374151;
+    border-radius: 8px;
+    overflow: hidden;
+}
+#orders-table th, #orders-table td {
+    border: 1px solid #4b5563;
+    padding: 12px;
+    text-align: right;
+}
+#orders-table th {
+    background-color: #1f2937;
+    color: #a0a7b4;
+    font-weight: bold;
+}
+.status-update-btn {
+    padding: 5px 10px;
+    background-color: #10b981; /* أخضر للتحديث */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.status-select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #4b5563;
+    background-color: #1f2937;
+    color: white;
+}
+
+/* تنسيق Modal (تسجيل الدخول) */
+.modal-overlay {
+    /* (تنسيقات Modal للتمركز - استخدم التنسيقات التي زودتك بها سابقاً) */
+    display: none; 
+    position: fixed; 
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+#login-form input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background-color: #374151;
+    border: 1px solid #4b5563;
+    color: white;
+    border-radius: 4px;
+}
+#login-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+}
