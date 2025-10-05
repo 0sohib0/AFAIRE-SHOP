@@ -9,9 +9,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const hiddenProductName = document.getElementById('hidden-product-name');
     const modalTitle = document.getElementById('modal-product-title');
 
-    // ... (كود فتح وإغلاق النافذة المنبثقة) ...
+    // 1. التحكم في النافذة المنبثقة (Modal Controls)
+    openBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const productName = btn.getAttribute('data-product-name');
+            
+            // تحديث اسم المنتج في عنوان النافذة
+            hiddenProductName.value = productName;
+            modalTitle.textContent = `أطلب ${productName} الآن (الدفع عند الاستلام)`;
+            
+            modal.style.display = 'flex'; // فتح النافذة
+            statusMessage.style.display = 'none'; 
+        });
+    });
 
-    // معالجة إرسال النموذج (API Call)
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // 2. معالجة إرسال النموذج (المنطق الخلفي)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -23,37 +44,36 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.style.color = 'yellow';
 
         try {
-            // 🔴 التأكيد النهائي للمسار والهيدرز 🔴
+            // الاتصال بدالة submit-order.js المنشورة على Vercel
             const response = await fetch('/api/submit-order', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json' 
                 },
-                body: JSON.stringify(data) // إرسال البيانات كـ JSON
+                body: JSON.stringify(data)
             });
 
-            // Vercel/Node.js قد يعطي استجابة ناجحة (200) حتى لو فشل الـ Supabase
-            // لذا، يجب التأكد من قراءة الرد بشكل صحيح.
             const result = await response.json(); 
 
-            if (response.ok && !result.details) { // إذا كانت الاستجابة 200 ولم تحمل تفاصيل خطأ
-                
+            if (response.ok) {
+                // إظهار رسالة النجاح
                 statusMessage.textContent = `✅ تم استلام طلبك بنجاح! سنتصل بك خلال دقائق.`;
                 statusMessage.style.color = 'green';
                 form.reset();
                 
-                // الإغلاق التلقائي بعد 3 ثوانٍ
+                // الإغلاق التلقائي (Alert احترافي)
                 setTimeout(() => {
                     modal.style.display = 'none'; 
                 }, 3000); 
 
             } else {
-                 // إذا كانت الاستجابة غير 200 أو احتوت على تفاصيل خطأ من الخادم
-                statusMessage.textContent = `❌ فشل: ${result.message || 'خطأ في الاتصال بالسيرفر.'}`;
+                 // عرض رسالة الخطأ من الخادم (Supabase/Vercel)
+                statusMessage.textContent = `❌ فشل الإرسال: ${result.message || 'خطأ في الاتصال بالشبكة.'}`;
                 statusMessage.style.color = 'red';
             }
         } catch (error) {
-            statusMessage.textContent = '❌ خطأ في الشبكة. يرجى المحاولة لاحقاً.';
+            // خطأ شبكة عام
+            statusMessage.textContent = '❌ خطأ في الشبكة. يرجى التحقق من الاتصال وإعادة المحاولة.';
             statusMessage.style.color = 'red';
         }
     });
