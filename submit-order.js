@@ -1,17 +1,26 @@
 // api/submit-order.js
+
 import { createClient } from '@supabase/supabase-js';
-import fetch from 'node-fetch'; 
+// لا نحتاج لـ 'node-fetch' بشكل صريح في Vercel الحديثة
+// قم بإزالة الـ import الخاص بها إذا كان موجوداً
 
-// 🔴 العودة إلى استخدام المفتاح العام (Anon Key) 🔴
+// 🔴 التعديل هنا: استخدام المفتاح السري لخدمة الكتابة الآمنة 🔴
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
-const SUPABASE_KEY_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
 
-// إنشاء العميل باستخدام المفتاح العام (Anon)
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY_ANON, {
+// المفتاح السري (Service Key) يتم قراءته من متغيرات البيئة في Vercel
+// تأكد أن Key في Vercel هو 'SUPABASE_SERVICE_KEY'
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY; 
+
+// إذا كان المفتاح السري موجوداً، نستخدمه لإنشاء العميل
+if (!SUPABASE_SERVICE_KEY) {
+    console.error("SUPABASE_SERVICE_KEY environment variable not set.");
+    // يمكنك إضافة معالجة خطأ هنا إذا لم يتم العثور على المفتاح
+}
+
+// إنشاء العميل باستخدام مفتاح الخدمة الذي لديه صلاحيات الكتابة
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: { persistSession: false }, 
-    global: { fetch: fetch } 
 });
-
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -21,30 +30,25 @@ export default async function handler(req, res) {
     try {
         const { product, client_name, phone_number, wilaya, address, quantity } = req.body;
 
-        if (!client_name || !phone_number || !wilaya || !product) {
-            return res.status(400).json({ message: 'الاسم، الهاتف، الولاية، واسم المنتج حقول مطلوبة.' });
+        if (!SUPABASE_SERVICE_KEY) {
+             return res.status(500).json({ message: 'خطأ في إعدادات الخادم: المفتاح السري غير موجود.' });
         }
         
-        // إذا كان RLS معطلاً، سيعمل هذا الكود فوراً
+        // ... (بقية التحققات)
+
         const { data, error } = await supabase
             .from('orders')
             .insert([
                 { 
-                    product_name: product,
-                    client_name: client_name,
-                    phone_number: phone_number,
-                    wilaya: wilaya,
-                    detailed_address: address,
-                    quantity: parseInt(quantity) || 1,
-                    status: 'جديد' 
+                   // ... بيانات الطلب ...
                 }
             ])
-            .select('id');
+            .select('id'); 
 
         if (error) {
             console.error('Supabase Insertion Error:', error);
-            // إذا فشل الإدراج الآن، فالمشكلة ليست RLS
-            return res.status(500).json({ message: 'فشل في إدخال الطلب: فشل في الاتصال بالخدمة.', details: error.message });
+            // قد يكون هذا الخطأ بسبب RLS إذا كان مفعلاً
+            return res.status(500).json({ message: 'فشل في إدخال الطلب: فشل في قاعدة البيانات.' });
         }
         
         return res.status(200).json({ 
