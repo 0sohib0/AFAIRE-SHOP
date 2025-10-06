@@ -1,7 +1,10 @@
 // admin.js
 
 // 💡 التصحيح: استخدام مسار CDN لحل خطأ "Failed to resolve module specifier"
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/+esm';
+// admin.js
+// 💡 تم التعديل للاستقرار المحلي
+const { createClient } = require('@supabase/supabase-js');
+// ... بقية الكود ...
 
 // المفاتيح الخاصة بك
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
@@ -168,3 +171,4 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
