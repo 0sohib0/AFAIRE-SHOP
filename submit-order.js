@@ -1,7 +1,7 @@
 // /api/submit-order.js
 
 // يجب تثبيت هذه الحزمة: npm install @supabase/supabase-js
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/+esm';
 
 // 🔴 تنبيه أمني: يفضل استخدام مفاتيح البيئة (process.env.SUPABASE_URL و process.env.SUPABASE_KEY)
 // المفاتيح الخاصة بك (مفتاح anon)
@@ -68,3 +68,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ message: 'خطأ داخلي في الخادم.' });
     }
 }
+
