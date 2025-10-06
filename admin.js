@@ -76,16 +76,16 @@ async function checkAuthStatus() {
 async function loadOrders() {
     elements.loadingMessage.style.display = 'block';
 
-    // جلب جميع الطلبات وفرزها حسب الأحدث
+    // 💡 التصحيح: تم إضافة detailed_address و quantity لاسترجاع البيانات الكاملة
     const { data, error } = await supabase
         .from('orders')
-        .select('id, created_at, product_name, client_name, phone_number, wilaya, status')
+        .select('id, created_at, product_name, client_name, phone_number, wilaya, detailed_address, quantity, status')
         .order('created_at', { ascending: false });
 
     elements.loadingMessage.style.display = 'none';
     
     if (error) {
-        elements.ordersTableBody.innerHTML = `<tr><td colspan="6" style="color:red;">خطأ في جلب البيانات: ${error.message}</td></tr>`;
+        elements.ordersTableBody.innerHTML = `<tr><td colspan="9" style="color:red;">خطأ في جلب البيانات: ${error.message}</td></tr>`;
         return;
     }
 
@@ -107,7 +107,12 @@ function renderOrders(orders) {
         row.insertCell().textContent = order.id;
         row.insertCell().textContent = order.product_name;
         row.insertCell().textContent = order.client_name;
+        row.insertCell().textContent = order.phone_number;
         row.insertCell().textContent = order.wilaya;
+        // عرض العنوان التفصيلي والكمية
+        row.insertCell().textContent = order.detailed_address || 'N/A';
+        row.insertCell().textContent = order.quantity;
+
 
         // عمود الحالة (مع قائمة منسدلة)
         const statusCell = row.insertCell();
