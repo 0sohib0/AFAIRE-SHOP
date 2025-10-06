@@ -1,4 +1,4 @@
-/* admin.css */
+/* admin.css */               
 body {
     background-color: #1f2937; /* خلفية داكنة للوحة التحكم */
     color: #ffffff;
@@ -112,3 +112,4 @@ main { padding: 30px; }
     margin-top: 10px;
     cursor: pointer;
 }
+
