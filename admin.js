@@ -1,10 +1,7 @@
-// admin.js
+const submitOrderHandler = require('./api/submit-order.js');
 
-// 💡 التصحيح: استخدام مسار CDN لحل خطأ "Failed to resolve module specifier"
-// admin.js
-// 💡 تم التعديل للاستقرار المحلي
-const { createClient } = require('@supabase/supabase-js');
-// ... بقية الكود ...
+Exporter vers Sheets
+...
 
 // المفاتيح الخاصة بك
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
@@ -171,4 +168,5 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
 
