@@ -22,7 +22,7 @@ export default async function handler(req, res) {
             client_name, 
             phone_number, 
             wilaya, 
-            address, // هذا هو العنوان التفصيلي من النموذج
+            address, // العنوان التفصيلي
             quantity 
         } = req.body;
 
@@ -36,12 +36,12 @@ export default async function handler(req, res) {
             .from('orders')
             .insert([
                 { 
-                    // يتطابق الآن مع Supabase: product_name و detailed_address
+                    // product_name و detailed_address يتطابقان مع الجدول
                     product_name: product,
                     client_name: client_name,
                     phone_number: phone_number,
                     wilaya: wilaya,
-                    detailed_address: address, // address من النموذج يقابل detailed_address في الجدول
+                    detailed_address: address, 
                     quantity: parseInt(quantity) || 1, 
                     status: 'جديد' 
                 }
@@ -50,7 +50,6 @@ export default async function handler(req, res) {
 
         if (error) {
             console.error('Supabase Insertion Error:', error);
-            // قد يكون الخطأ الآن بسبب RLS إذا لم يتم تفعيلها
             return res.status(500).json({ 
                 message: 'فشل في إدخال الطلب. تأكد من تطابق أسماء الأعمدة في Supabase.', 
                 details: error.message 
