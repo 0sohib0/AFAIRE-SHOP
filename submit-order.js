@@ -1,18 +1,17 @@
 // /api/submit-order.js
 
-// يجب تثبيت هذه الحزمة: npm install @supabase/supabase-js
-const { createClient } = require('@supabase/supabase-js');
+// 💡 تم التغيير إلى صيغة CommonJS (require) لزيادة الاستقرار على Render
+const { createClient } = require('@supabase/supabase-js'); 
 
-
-// 🔴 التصحيح: استخدام متغيرات البيئة (process.env)
-// Vercel يجب أن يقوم بحقن هذه القيم من إعدادات البيئة (SUPABASE_URL و SUPABASE_KEY)
+// 🔴 المفاتيح الآن ستُقرأ بشكل مثالي من متغيرات البيئة في Render
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY; 
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // الدالة الرئيسية التي تستقبل طلبات HTTP
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+    
     // التأكد من وجود مفاتيح البيئة قبل المتابعة
     if (!supabaseUrl || !supabaseKey) {
         console.error("Supabase environment variables are missing.");
@@ -24,7 +23,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        // استخراج البيانات من الطلب (هذه هي أسماء الحقول في النموذج)
+        // استخراج البيانات من الطلب
         const { 
             product, 
             client_name, 
@@ -39,12 +38,11 @@ export default async function handler(req, res) {
             return res.status(400).json({ message: 'الاسم، الهاتف، الولاية، واسم المنتج حقول مطلوبة.' });
         }
         
-        // 💡 التصحيح: الإدراج باستخدام أسماء الأعمدة الصحيحة في Supabase
+        // الإدراج باستخدام أسماء الأعمدة الصحيحة
         const { data, error } = await supabase
             .from('orders')
             .insert([
                 { 
-                    // product_name و detailed_address يتطابقان مع الجدول
                     product_name: product,
                     client_name: client_name,
                     phone_number: phone_number,
@@ -58,7 +56,6 @@ export default async function handler(req, res) {
 
         if (error) {
             console.error('Supabase Insertion Error:', error);
-            // إرسال رسالة خطأ واضحة للمساعدة في التشخيص
             return res.status(500).json({ 
                 message: 'فشل في إدخال الطلب. تأكد من تطابق أسماء الأعمدة في Supabase.', 
                 details: error.message 
@@ -76,4 +73,3 @@ export default async function handler(req, res) {
         return res.status(500).json({ message: 'خطأ داخلي في الخادم.' });
     }
 }
-
