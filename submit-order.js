@@ -1,9 +1,9 @@
 // /api/submit-order.js
 
-// 💡 تم التغيير إلى صيغة CommonJS (require) لزيادة الاستقرار على Render
+// 💡 تم التحويل إلى صيغة CommonJS (require)
 const { createClient } = require('@supabase/supabase-js'); 
 
-// 🔴 المفاتيح الآن ستُقرأ بشكل مثالي من متغيرات البيئة في Render
+// قراءة المتغيرات من البيئة (Render سيقوم بحقنها، و dotenv سيقوم بحقنها محلياً)
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY; 
 
@@ -12,33 +12,36 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // الدالة الرئيسية التي تستقبل طلبات HTTP
 module.exports = async function handler(req, res) {
     
-    // التأكد من وجود مفاتيح البيئة قبل المتابعة
+    // التأكد من وجود مفاتيح البيئة قبل المتابعة (ضروري للتشخيص)
     if (!supabaseUrl || !supabaseKey) {
         console.error("Supabase environment variables are missing.");
         return res.status(500).json({ message: 'خطأ في إعدادات الخادم. يرجى مراجعة مفاتيح Supabase.' });
     }
 
     if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'الرجاء إرسال طلب POST.' });
+        // Render يتوقع منك تعيين رمز الحالة والرد
+        res.status(405).json({ message: 'الرجاء إرسال طلب POST.' });
+        return;
     }
 
     try {
-        // استخراج البيانات من الطلب
+        // استخراج البيانات من الطلب (هذه هي أسماء الحقول في النموذج)
         const { 
             product, 
             client_name, 
             phone_number, 
             wilaya, 
-            address, // العنوان التفصيلي
+            address, 
             quantity 
         } = req.body;
 
         // تحقق بسيط من البيانات الأساسية
         if (!client_name || !phone_number || !wilaya || !product) {
-            return res.status(400).json({ message: 'الاسم، الهاتف، الولاية، واسم المنتج حقول مطلوبة.' });
+            res.status(400).json({ message: 'الاسم، الهاتف، الولاية، واسم المنتج حقول مطلوبة.' });
+            return;
         }
         
-        // الإدراج باستخدام أسماء الأعمدة الصحيحة
+        // الإدراج باستخدام أسماء الأعمدة الصحيحة في Supabase
         const { data, error } = await supabase
             .from('orders')
             .insert([
@@ -56,20 +59,21 @@ module.exports = async function handler(req, res) {
 
         if (error) {
             console.error('Supabase Insertion Error:', error);
-            return res.status(500).json({ 
+            res.status(500).json({ 
                 message: 'فشل في إدخال الطلب. تأكد من تطابق أسماء الأعمدة في Supabase.', 
                 details: error.message 
             });
+            return;
         }
 
         // إرسال رد النجاح
-        return res.status(200).json({ 
+        res.status(200).json({ 
             message: 'تم استلام الطلب بنجاح.', 
             orderId: data[0].id 
         });
 
     } catch (error) {
         console.error('General Server Error:', error);
-        return res.status(500).json({ message: 'خطأ داخلي في الخادم.' });
+        res.status(500).json({ message: 'خطأ داخلي في الخادم.' });
     }
 }
