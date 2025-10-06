@@ -44,6 +44,9 @@ main { padding: 30px; }
 }
 .stats-bar strong { color: #facc15; }
 
+/* admin.css */
+/* ... (الكود لم يتغير، لكنه متوافق الآن مع admin.html الجديد) ... */
+
 /* تنسيق الجدول */
 #orders-table {
     width: 100%;
@@ -62,6 +65,7 @@ main { padding: 30px; }
     color: #a0a7b4;
     font-weight: bold;
 }
+/* ... (بقية الكود بدون تغيير) ... */
 .status-update-btn {
     padding: 5px 10px;
     background-color: #10b981; /* أخضر للتحديث */
