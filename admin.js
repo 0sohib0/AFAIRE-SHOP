@@ -1,6 +1,6 @@
 // admin.js
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/+esm';
 
 // 🔴 المفاتيح الخاصة بك - يجب أن تكون هي نفسها المستخدمة في المتجر 🔴
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
@@ -168,3 +168,4 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
