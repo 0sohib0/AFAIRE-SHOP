@@ -3,14 +3,21 @@
 // يجب تثبيت هذه الحزمة: npm install @supabase/supabase-js
 import { createClient } from '@supabase/supabase-js';
 
-// مفاتيح Supabase الخاصة بك
-const supabaseUrl = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ'; 
+// 🔴 التصحيح: استخدام متغيرات البيئة (process.env)
+// Vercel يجب أن يقوم بحقن هذه القيم من إعدادات البيئة (SUPABASE_URL و SUPABASE_KEY)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY; 
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // الدالة الرئيسية التي تستقبل طلبات HTTP
 export default async function handler(req, res) {
+    // التأكد من وجود مفاتيح البيئة قبل المتابعة
+    if (!supabaseUrl || !supabaseKey) {
+        console.error("Supabase environment variables are missing.");
+        return res.status(500).json({ message: 'خطأ في إعدادات الخادم. يرجى مراجعة مفاتيح Supabase.' });
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'الرجاء إرسال طلب POST.' });
     }
@@ -50,6 +57,7 @@ export default async function handler(req, res) {
 
         if (error) {
             console.error('Supabase Insertion Error:', error);
+            // إرسال رسالة خطأ واضحة للمساعدة في التشخيص
             return res.status(500).json({ 
                 message: 'فشل في إدخال الطلب. تأكد من تطابق أسماء الأعمدة في Supabase.', 
                 details: error.message 
