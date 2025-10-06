@@ -1,12 +1,10 @@
 // api/telegram-webhook.js
 // يجب أن يكون لديك ملف package.json يحتوي على 'node-fetch' إذا كنت تستخدم Node.js أقل من v18
+import fetch from 'node-fetch'; 
 
-// 🔴 تنبيه هام: قم بتحديث قيمة TELEGRAM_CHAT_ID بمعرف المحادثة الصحيح 🔴
-
-// api/telegram-webhook.js
-const TELEGRAM_BOT_TOKEN = '8296247378:AAEs8ZGTrN38EMIRA3OvGIJgmWUX6ehe7jc'; 
-const TELEGRAM_CHAT_ID = '2093416949'; // هذا هو الرقم النهائي الصحيح
-// ... باقي الكود ...
+// 🔴 تنبيه أمني: يفضل استخدام متغيرات البيئة في الخادم
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8296247378:AAEs8ZGTrN38EMIRA3OvGIJgmWUX6ehe7jc'; 
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '2093416949'; 
 
 const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
@@ -28,11 +26,11 @@ export default async function handler(req, res) {
         }
 
         // 1. استخراج البيانات من الطلب
-        const { product_name, client_name, phone_number, wilaya, quantity, status } = newRecord;
+        const { product_name, client_name, phone_number, wilaya, quantity, status, detailed_address } = newRecord;
 
-        // 2. تنسيق رسالة الإشعار باستخدام HTML للتحسين
+        // 2. تنسيق رسالة الإشعار باستخدام Markdown للتحسين
         const messageText = `
-        ✨ *طلب جديد في متجر Acme Store DZ!* ✨
+        ✨ *طلب جديد في متجر SOHIB&HAMZA DZ!* ✨
         ----------------------------------
         
         *المنتج:* ${product_name}
@@ -41,6 +39,7 @@ export default async function handler(req, res) {
         *اسم العميل:* ${client_name}
         *الهاتف:* ${phone_number}
         *الولاية:* ${wilaya}
+        *العنوان:* ${detailed_address}
         *الحالة:* ${status}
         ----------------------------------
         _الرجاء التأكيد فوراً عبر الاتصال بالعميل._
