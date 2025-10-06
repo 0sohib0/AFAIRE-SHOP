@@ -2,11 +2,13 @@
   "name": "acme-store-dz-backend",
   "version": "1.0.0",
   "description": "Serverless backend for order collection using Supabase",
-  "main": "api/submit-order.js",
+  "main": "server.js", 
   "scripts": {
+    "start": "node server.js", 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.4"
+    "@supabase/supabase-js": "^2.38.4",
+    "express": "^4.18.2"
   }
 }
