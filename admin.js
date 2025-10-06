@@ -1,8 +1,9 @@
 // admin.js
 
+// 💡 التصحيح: استخدام مسار CDN لحل خطأ "Failed to resolve module specifier"
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/+esm';
 
-// 🔴 المفاتيح الخاصة بك - يجب أن تكون هي نفسها المستخدمة في المتجر 🔴
+// المفاتيح الخاصة بك
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -76,7 +77,7 @@ async function checkAuthStatus() {
 async function loadOrders() {
     elements.loadingMessage.style.display = 'block';
 
-    // 💡 التصحيح: تم إضافة detailed_address و quantity لاسترجاع البيانات الكاملة
+    // 💡 جلب جميع الأعمدة المطلوبة
     const { data, error } = await supabase
         .from('orders')
         .select('id, created_at, product_name, client_name, phone_number, wilaya, detailed_address, quantity, status')
@@ -109,7 +110,6 @@ function renderOrders(orders) {
         row.insertCell().textContent = order.client_name;
         row.insertCell().textContent = order.phone_number;
         row.insertCell().textContent = order.wilaya;
-        // عرض العنوان التفصيلي والكمية
         row.insertCell().textContent = order.detailed_address || 'N/A';
         row.insertCell().textContent = order.quantity;
 
@@ -168,4 +168,3 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
-
