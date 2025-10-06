@@ -1,7 +1,8 @@
 // /api/submit-order.js
 
 // يجب تثبيت هذه الحزمة: npm install @supabase/supabase-js
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
+
 
 // 🔴 التصحيح: استخدام متغيرات البيئة (process.env)
 // Vercel يجب أن يقوم بحقن هذه القيم من إعدادات البيئة (SUPABASE_URL و SUPABASE_KEY)
@@ -75,3 +76,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ message: 'خطأ داخلي في الخادم.' });
     }
 }
+
