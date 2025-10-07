@@ -1,3 +1,5 @@
+app.use(express.static(__dirname)); 
+
 const submitOrderHandler = require('./api/submit-order.js');
 
 Exporter vers Sheets
@@ -168,5 +170,6 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
 
 
