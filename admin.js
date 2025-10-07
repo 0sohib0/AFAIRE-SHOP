@@ -1,6 +1,5 @@
 app.use(express.static(__dirname)); 
-
-const submitOrderHandler = require('./api/submit-order.js');
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 Exporter vers Sheets
 ...
@@ -170,6 +169,7 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
 
 
 
