@@ -1,8 +1,8 @@
 app.use(express.static(__dirname)); 
+
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-Exporter vers Sheets
-...
+
 
 // المفاتيح الخاصة بك
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
@@ -169,6 +169,7 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
 
 
 
