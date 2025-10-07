@@ -1,4 +1,5 @@
-app.use(express.static(__dirname)); 
+
+const { createClient } = require('@supabase/supabase-js'); 
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -169,6 +170,7 @@ async function updateOrderStatus(orderId) {
 
 // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
 checkAuthStatus();
+
 
 
 
