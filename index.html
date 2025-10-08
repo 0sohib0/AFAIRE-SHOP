@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOHIB&HAMZA Store DZ</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+
+    <main class="product-grid">
+
+       <div class="product-item large-item">
+    <img src="WW.jpg" alt="كوب Acme">
+    <div class="product-info">
+        <span>اشري يا الخانزا باش تتبدل ريحتك</span>
+        <span class="price">4000 DZD</span>
+    </div>
+    <button class="modal-open-btn" data-product-id="acme-cup" data-product-name="كوب Acme">أطلب الآن</button>
+</div>
+
+        <div class="product-item small-item">
+            <img src="CC.jpg" alt="ملابس بيبي Acme">
+            <div class="product-info">
+                <span> تيشورت عصري اختلف عليهم يا حميزو قادرين نديروها</span>
+                <span class="price">3000 DZD</span>
+            </div>
+            <button class="modal-open-btn" data-product-id="acme-onesie" data-product-name="ملابس بيبي Acme">أطلب الآن</button>
+        </div>
+        
+        </main>
+
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <form id="orderForm" class="order-form">
+                <h3 id="modal-product-title">أطلب الآن (الدفع عند الاستلام)</h3>
+                
+                <input type="hidden" name="product" id="hidden-product-name" value=""> 
+
+                <label for="clientName">الاسم الكامل:</label>
+                <input type="text" id="clientName" name="client_name" required>
+
+                <label for="clientPhone">رقم الهاتف (ضروري):</label>
+                <input type="tel" id="clientPhone" name="phone_number" required>
+
+                <label for="clientWilaya">الولاية:</label>
+                <input type="text" id="clientWilaya" name="wilaya" required> 
+
+                <label for="clientAddress">العنوان التفصيلي (البلدية):</label>
+                <textarea id="clientAddress" name="address" required></textarea>
+
+                <label for="clientQuantity">الكمية:</label>
+                <input type="number" id="clientQuantity" name="quantity" value="1" min="1" required>
+
+                <button type="submit">تأكيد الطلب</button>
+                <p id="submissionStatus" style="margin-top: 10px; text-align: center; display: none;"></p>
+            </form>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links-group">
+                <div class="logo-section">
+                    <span class="arrow-icon">▲</span> 
+                    <span>SOHIB&HAMZA STORE</span>
+                </div>
+                <nav class="footer-nav">
+                    <a href="#">الرئيسية</a>
+                    <a href="#">من نحن</a>
+                    <a href="#">الشروط والأحكام</a>
+                    <a href="#">سياسة الشحن والإرجاع</a>
+                </nav>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2023-2025 SOHIB&HAMZA, Inc. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script> 
+</body>
+
+</html>
+
+
+
