@@ -5,38 +5,47 @@
     box-sizing: border-box;
 }
 
-/* التنسيق العام والوضع الداكن */
+/* 🔴 الخطوط: استخدام خط أكثر حداثة ووضوحاً */
 body {
-    background-color: #121212; 
+    background-color: #0d0d0d; /* خلفية داكنة جداً */
     color: #ffffff;
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    font-family: 'Tajawal', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     line-height: 1.6;
 }
-a { color: #ffffff; text-decoration: none; }
+a { color: #4ade80; text-decoration: none; } 
 
 /* --- شبكة المنتجات (Product Grid) - لضمان العرض الأفقي --- */
 .product-grid {
     display: flex;
     flex-wrap: wrap; 
-    padding: 20px;
-    gap: 20px; 
+    padding: 30px 20px;
+    gap: 25px; /* زيادة المسافة بين البطاقات */
     max-width: 1400px;
     margin: 0 auto;
 }
 
 .product-item {
-    background-color: #000000;
-    border: 1px solid #333333; 
-    border-radius: 8px; 
+    background-color: #1a1a1a; /* خلفية أغمق من الخلفية العامة */
+    border: none; 
+    border-radius: 12px; /* حواف أكثر دائرية */
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-end; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* ظل عميق */
+    transition: transform 0.4s ease, box-shadow 0.4s ease; /* إضافة انتقال للتأثيرات */
+    transform-style: preserve-3d; /* لتفعيل التأثير ثلاثي الأبعاد */
 }
-.small-item { flex: 1 1 calc(25% - 20px); min-width: 250px; height: 350px; }
-.large-item { flex: 1 1 calc(50% - 20px); min-width: 450px; height: 450px; }
+/* 🔴 تأثير 3D TILT عند التحويم 🔴 */
+.product-item:hover { 
+    transform: perspective(1000px) rotateX(1deg) rotateY(1deg) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+
+.small-item { flex: 1 1 calc(25% - 25px); min-width: 250px; height: 380px; }
+.large-item { flex: 1 1 calc(50% - 25px); min-width: 450px; height: 500px; }
 
 .product-item img {
     width: 100%;
@@ -44,112 +53,170 @@ a { color: #ffffff; text-decoration: none; }
     object-fit: cover;
     position: absolute;
     top: 0; left: 0; z-index: 1; 
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease;
 }
 .product-item:hover img { transform: scale(1.05); }
 
 .product-info {
     position: absolute;
-    bottom: 50px; 
-    right: 15px; 
+    bottom: 0; /* لصق الشريط في الأسفل */
+    right: 0; 
     z-index: 10; 
     display: flex;
     flex-direction: column;
-    width: calc(100% - 30px);
-    font-size: 1em;
-    direction: rtl; /* تصحيح لظهور النص العربي بشكل سليم */
-    text-shadow: 0 0 5px #000; 
-    background: rgba(0, 0, 0, 0.4); 
-    padding: 8px;
-    border-radius: 4px;
+    align-items: flex-end;
+    width: 100%;
+    font-size: 1.1em;
+    direction: rtl; 
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.0)); /* تدرج لجعل النص واضحاً */
+    padding: 20px 15px 70px 15px; /* مساحة كبيرة للزر */
+    transition: all 0.3s;
 }
 .product-info span { font-weight: bold; }
-.price { color: #00b34d; } /* لون أخضر للسعر */
+/* 🔴 تنسيق السعر (بما في ذلك التخفيض) 🔴 */
+.price-container { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-top: 5px;
+}
+.price { color: #4ade80; font-size: 1.5em; font-weight: 800; } /* سعر أخضر فاقع */
+.original-price { 
+    color: #ff0055; /* أحمر للتنبيه */
+    text-decoration: line-through; 
+    font-size: 0.9em; 
+    opacity: 0.7; 
+}
 
 
-/* --- زر فتح النافذة المنبثقة --- */
+/* --- زر فتح النافذة المنبثقة (مُجمل) --- */
 .product-item button.modal-open-btn {
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     right: 15px;
     z-index: 20; 
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
+    padding: 12px 25px;
+    background-color: #f59e0b; /* لون برتقالي جذاب */
+    color: black;
     border: none;
-    border-radius: 50px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
+    font-weight: 900;
+    font-size: 1em;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.5);
+    transition: all 0.3s ease;
+    
+    /* 🔴 تأثير نبض خفيف لجذب الانتباه 🔴 */
+    animation: pulse 2s infinite; 
 }
-.product-item button.modal-open-btn:hover { background-color: #0056b3; }
+.product-item button.modal-open-btn:hover { 
+    background-color: #d97706; 
+    transform: scale(1.05);
+    animation: none; /* إيقاف النبض عند التحويم */
+}
+
+/* تعريف تأثير النبض */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); opacity: 0.9; }
+    100% { transform: scale(1); }
+}
 
 
-/* --- تنسيق النافذة المنبثقة (Modal) لحل التداخل والتمركز --- */
-/* --- تنسيق النافذة المنبثقة (Modal) لحل التداخل والتمركز --- */
+/* --- تنسيق النافذة المنبثقة (Modal) - تم التجميل في الخطوة السابقة --- */
 .modal-overlay {
     display: none; 
     position: fixed; 
     z-index: 1000;
     left: 0; top: 0;
     width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.9); 
     justify-content: center;
     align-items: center;
 }
 .modal-content {
-    background-color: #121212;
+    background-color: #1a1a1a; 
     padding: 30px;
-    border: 1px solid #333;
+    border: 1px solid #444; 
     width: 90%; 
     max-width: 450px; 
-    border-radius: 8px;
+    border-radius: 12px; 
     position: relative;
-    /* 💡 الحل: استخدم Flexbox للتنسيق الداخلي */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     display: flex;
     flex-direction: column;
-    gap: 15px; /* إضافة مسافة بين العناصر الرئيسية */
+    gap: 15px; 
 }
-.modal-close-btn { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
+.modal-close-btn { 
+    color: #f3f3f3; 
+    font-size: 32px; 
+    font-weight: 300; 
+    cursor: pointer; 
+    position: absolute; 
+    top: 15px;
+    left: 15px;
+    transition: color 0.2s;
+}
+.modal-close-btn:hover { color: #ff0055; } 
 
-/* 🔴 الحل الجذري لمشكلة تداخل الحقول في النموذج 🔴 */
+#modal-product-title {
+    color: #4ade80; 
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: right;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+
+
 .order-form {
     display: flex;
     flex-direction: column; 
-    gap: 5px; 
+    gap: 15px; 
 }
-/* إضافة تنسيق جديد لتجميع الـ Label والـ Input معاً */
 .order-form label {
     display: block; 
-    margin-top: 10px;
-    font-size: 0.9em;
-    color: #ccc;
+    margin-bottom: 5px; 
+    font-size: 0.95em;
+    color: #e0e0e0;
     text-align: right;
-    font-weight: bold; /* زيادة وضوح التسميات */
+    font-weight: 600; 
 }
 .order-form input, .order-form textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #333;
-    border-radius: 4px;
+    padding: 12px; 
+    border: 1px solid #444;
+    border-radius: 6px; 
     background-color: #000;
     color: #fff;
     box-sizing: border-box;
-    direction: rtl; /* تصحيح للإدخال العربي */
+    direction: rtl; 
     text-align: right; 
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.order-form input:focus, .order-form textarea:focus {
+    border-color: #4ade80; 
+    box-shadow: 0 0 5px rgba(74, 222, 128, 0.5); 
+    outline: none;
 }
 .order-form button[type="submit"] {
-    margin-top: 20px;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
+    margin-top: 25px;
+    padding: 15px; 
+    background-color: #f59e0b; 
+    color: #1a1a1a;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px; 
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s;
+    font-size: 1.1em;
+    transition: background-color 0.3s, transform 0.2s;
 }
-.order-form button[type="submit"]:hover { background-color: #0056b3; }
+.order-form button[type="submit"]:hover { 
+    background-color: #d97706; 
+    transform: translateY(-2px); 
+}
+
 
 /* --- تنسيق واجهة القدم (Footer) --- */
 .footer {
@@ -159,76 +226,56 @@ a { color: #ffffff; text-decoration: none; }
     margin-top: 50px;
 }
 .footer-content { display: flex; justify-content: space-between; padding: 0 40px 60px; max-width: 1400px; margin: 0 auto; }
-.logo-section { display: flex; align-items: flex-start; gap: 5px; font-weight: bold; font-size: 0.9em; }
+.logo-section { display: flex; align-items: flex-start; gap: 5px; font-weight: bold; font-size: 1em; color: #4ade80; }
 .footer-nav { display: flex; flex-direction: column; gap: 8px; font-size: 0.85em; }
-.footer-nav a { color: #b3b3b3; }
+.footer-nav a { color: #b3b3b3; transition: color 0.2s; }
+.footer-nav a:hover { color: #ffffff; }
 .footer-bottom { background-color: #0c0c0c; border-top: 1px solid #333333; padding: 15px 40px; display: flex; justify-content: space-between; font-size: 0.75em; color: #777777; max-width: 1400px; margin: 0 auto; }
-/* --- 🔴 MEDIA QUERIES: التنسيقات الخاصة بالهواتف (Mobile Responsiveness) 🔴 --- */
 
+
+/* --- 🔴 MEDIA QUERIES: التنسيقات الخاصة بالهواتف (Mobile Responsiveness) 🔴 --- */
 @media (max-width: 768px) {
     
-    /* 1. شبكة المنتجات (Product Grid) */
     .product-grid {
-        /* إزالة المسافة الجانبية الكبيرة */
-        padding: 10px;
-        gap: 15px; /* تقليل المسافة بين البطاقات */
+        padding: 15px;
+        gap: 15px; 
     }
 
-    /* 2. تصحيح أحجام البطاقات للهاتف */
     .small-item, .large-item {
-        /* جعل كل بطاقة تأخذ صفاً كاملاً */
         flex: 1 1 100%; 
         min-width: 90%; 
-        height: 300px; 
+        height: 350px; 
     }
     
-    .large-item {
-        height: 350px; /* زيادة بسيطة لحجم البطاقة الكبيرة */
+    .product-info {
+        font-size: 1em;
+        padding: 15px 15px 65px 15px;
+    }
+    
+    .price { font-size: 1.4em; }
+
+    .product-item button.modal-open-btn {
+        padding: 15px 20px;
+        font-size: 1.1em;
+        border-radius: 6px; 
     }
 
-    /* 3. تنسيق المعلومات والأزرار داخل البطاقة */
-    .product-info {
-        font-size: 0.9em;
-        /* تقليل المسافة في الأسفل لضغط المحتوى */
-        bottom: 40px; 
-        right: 10px;
-        width: calc(100% - 20px);
-    }
-    
-    .product-item button.modal-open-btn {
-        /* جعل الزر أعرض وأسهل للنقر */
-        padding: 12px 20px;
-        font-size: 1.1em;
-        border-radius: 8px; /* زر مربع بدلاً من دائري للوضوح */
-        bottom: 10px;
-    }
-    
-    /* 4. النافذة المنبثقة (Modal) */
     .modal-content {
-        /* جعل النافذة المنبثقة أكبر على شاشة الهاتف */
-        width: 95%; 
-        margin: 20px 0;
+        padding: 20px;
+        margin: 10px;
+        max-width: 95%; 
     }
     
-    /* 5. واجهة القدم (Footer) */
     .footer-content {
-        /* جعل عناصر الـ footer تظهر فوق بعضها البعض */
         flex-direction: column;
         gap: 20px;
-        padding: 20px 10px 40px;
+        padding: 20px 15px 40px;
     }
 
-    .footer-links-group {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
     .footer-bottom {
-        /* جعل عناصر الشريط السفلي تظهر بشكل مكدس */
         flex-direction: column;
         text-align: center;
         gap: 5px;
-        padding: 10px 10px;
+        padding: 10px 15px;
     }
-
 }
