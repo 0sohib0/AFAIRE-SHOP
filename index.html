@@ -12,24 +12,27 @@
     <main class="product-grid" id="dynamic-product-grid">
        <p id="loading-products-message" style="width:100%; text-align:center;">جاري تحميل المنتجات...</p>
     </main>
-
+    
     <div id="order-modal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
-            <h3 id="modal-product-title">أطلب المنتج الآن (الدفع عند الاستلام)</h3>
+            <h3 id="modal-product-title">أطلب الآن (الدفع عند الاستلام)</h3>
             
-            <form id="orderForm">
-                <input type="hidden" id="hidden-product-name" name="product">
+            <form id="orderForm" class="order-form">
+                
+                <input type="hidden" name="product" id="hidden-product-name" value=""> 
 
                 <label for="clientName">الاسم الكامل:</label>
                 <input type="text" id="clientName" name="client_name" required>
 
-                <label for="clientPhone">رقم الهاتف:</label>
+                <label for="clientPhone">رقم الهاتف (ضروري):</label>
                 <input type="tel" id="clientPhone" name="phone_number" required>
 
                 <label for="clientWilaya">الولاية:</label>
                 <input type="text" id="clientWilaya" name="wilaya" required> 
-
+                
+                <label for="clientSize">رقم الحذاء (Pointure):</label>
+                <input type="number" id="clientSize" name="shoe_size" min="36" max="46" required>
                 <label for="clientAddress">العنوان التفصيلي (البلدية):</label>
                 <textarea id="clientAddress" name="address" required></textarea>
 
@@ -59,10 +62,11 @@
         </div>
 
         <div class="footer-bottom">
-            <p>© 2023-2024 SOHIB&HAMZA STORE. جميع الحقوق محفوظة.</p>
+            <p>© 2023-2025 SOHIB&HAMZA, Inc. جميع الحقوق محفوظة.</p>
         </div>
     </footer>
 
     <script src="app.js"></script> 
 </body>
+
 </html>
