@@ -62,9 +62,11 @@
                 <label for="product-id">Product ID (مثال: new-mug):</label>
                 <input type="text" id="product-id" required>
 
-                <label for="product-price">السعر (DZD):</label>
+                <label for="product-price">السعر الأصلي (DZD):</label>
                 <input type="number" id="product-price" min="1" required>
-
+                
+                <label for="product-discount">سعر التخفيض (DZD - اختياري):</label>
+                <input type="number" id="product-discount" min="0" placeholder="اتركه فارغاً إذا لم يكن هناك تخفيض">
                 <label for="product-img">مسار الصورة (مثال: img/new-mug.jpg):</label>
                 <input type="text" id="product-img" required>
                 
@@ -78,7 +80,8 @@
                     <tr>
                         <th>Product ID</th>
                         <th>الاسم</th>
-                        <th>السعر</th>
+                        <th>السعر الأصلي</th>
+                        <th>سعر التخفيض</th>
                         <th>صورة</th>
                     </tr>
                 </thead>
@@ -120,14 +123,10 @@
             const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
             const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
             
-            // 💡 استخدام createClient المتاح عالمياً (الآن داخل DOMContentLoaded)
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
-            // تعريف منتجات وهمية لأغراض التجربة، يفضل مستقبلاً جلبها من Supabase
-            const MOCK_PRODUCTS = {
-                "acme-cup": { name: "كوب Acme", price: 4000 },
-                "acme-onesie": { name: "ملابس بيبي Acme", price: 3000 }
-            };
+            // تم تحديث هذه القائمة لتشمل سعر التخفيض
+            const MOCK_PRODUCTS = {}; // ستعتمد الآن على البيانات المجلوبة من Supabase
 
 
             const elements = {
@@ -158,23 +157,20 @@
 
             const STATUSES = ['جديد', 'قيد التأكيد', 'قيد الشحن', 'تم التوصيل', 'ملغى'];
 
-            // 0. وظيفة معالجة التبويبات (جديدة)
+            // 0. وظيفة معالجة التبويبات 
             elements.tabBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const targetTab = btn.getAttribute('data-tab');
 
-                    // إزالة 'active' من كل الأزرار والمحتوى
                     elements.tabBtns.forEach(b => b.classList.remove('active'));
                     elements.tabContents.forEach(c => c.classList.remove('active'));
                     elements.tabContents.forEach(c => c.style.display = 'none');
 
 
-                    // إضافة 'active' للزر والمحتوى المستهدف
                     btn.classList.add('active');
                     document.getElementById(targetTab).classList.add('active');
                     document.getElementById(targetTab).style.display = 'block';
 
-                    // تحميل البيانات عند التحول إلى تبويبة
                     if (targetTab === 'orders-tab') loadOrders();
                     if (targetTab === 'stats-tab') calculateStats();
                     if (targetTab === 'products-tab') loadProductsList();
@@ -182,7 +178,7 @@
             });
 
 
-            // 1. وظيفة تسجيل الدخول (لم تتغير)
+            // 1. وظيفة تسجيل الدخول 
             elements.loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
@@ -200,7 +196,7 @@
                 }
             });
 
-            // 2. وظيفة تسجيل الخروج (لم تتغير)
+            // 2. وظيفة تسجيل الخروج 
             elements.logoutBtn.addEventListener('click', async () => {
                 const { error } = await supabase.auth.signOut();
                 if (!error) {
@@ -208,12 +204,12 @@
                 }
             });
 
-            // 3. عرض شاشة تسجيل الدخول (لم تتغير)
+            // 3. عرض شاشة تسجيل الدخول 
             elements.loginBtn.addEventListener('click', () => {
                 elements.loginModal.style.display = 'flex';
             });
 
-            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة (مُعدَّل)
+            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة 
             async function checkAuthStatus() {
                 const { data: { session } } = await supabase.auth.getSession();
                 
@@ -223,7 +219,6 @@
                     elements.dashboard.style.display = 'block';
                     elements.loginModal.style.display = 'none';
                     
-                    // تأكد من عرض تبويبة الطلبات وتحميلها افتراضياً
                     document.getElementById('orders-tab').style.display = 'block'; 
                     loadOrders();
                 } else {
@@ -235,7 +230,7 @@
                 }
             }
 
-            // 5. تحميل الطلبات من Supabase (لم تتغير)
+            // 5. تحميل الطلبات من Supabase 
             async function loadOrders() {
                 elements.loadingMessage.style.display = 'block';
 
@@ -254,7 +249,7 @@
                 renderOrders(data);
             }
 
-            // 6. عرض الطلبات في الجدول (لم تتغير)
+            // 6. عرض الطلبات في الجدول 
             function renderOrders(orders) {
                 elements.ordersTableBody.innerHTML = '';
                 let newCount = 0;
@@ -265,7 +260,6 @@
                     const row = elements.ordersTableBody.insertRow();
                     row.dataset.orderId = order.id;
 
-                    // الأعمدة
                     row.insertCell().textContent = order.id;
                     row.insertCell().textContent = order.product_name;
                     row.insertCell().textContent = order.client_name;
@@ -275,11 +269,9 @@
                     row.insertCell().textContent = order.quantity;
 
 
-                    // عمود الحالة (مع قائمة منسدلة)
                     const statusCell = row.insertCell();
                     statusCell.innerHTML = createStatusSelect(order.status, order.id);
 
-                    // عمود الإجراءات (زر التحديث)
                     const actionCell = row.insertCell();
                     const updateBtn = document.createElement('button');
                     updateBtn.textContent = 'تحديث الحالة';
@@ -288,12 +280,11 @@
                     actionCell.appendChild(updateBtn);
                 });
 
-                // تحديث الإحصائيات
                 elements.totalOrders.textContent = orders.length;
                 elements.newOrders.textContent = newCount;
             }
 
-            // 7. إنشاء القائمة المنسدلة للحالة (لم تتغير)
+            // 7. إنشاء القائمة المنسدلة للحالة 
             function createStatusSelect(currentStatus, orderId) {
                 let html = `<select class="status-select" data-order-id="${orderId}">`;
                 STATUSES.forEach(status => {
@@ -304,7 +295,7 @@
                 return html;
             }
 
-            // 8. وظيفة تحديث حالة الطلب (لم تتغير)
+            // 8. وظيفة تحديث حالة الطلب 
             async function updateOrderStatus(orderId) {
                 const selectElement = document.querySelector(`.status-select[data-order-id="${orderId}"]`);
                 const newStatus = selectElement.value;
@@ -324,24 +315,29 @@
                     alert('تم تحديث الحالة بنجاح!');
                     loadOrders(); 
                     if (document.getElementById('stats-tab').classList.contains('active')) {
-                        calculateStats(); // تحديث الإحصائيات إذا كانت التبويبة مفتوحة
+                        calculateStats(); 
                     }
                 }
             }
 
-            // 9. إضافة منتج جديد إلى جدول (جديدة)
+            // 9. إضافة منتج جديد إلى جدول (مُحدَّث لمعالجة التخفيض)
             elements.productForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 elements.productStatus.textContent = '';
                 
+                const discountPriceValue = document.getElementById('product-discount').value;
+
                 const product = {
                     product_id: document.getElementById('product-id').value,
                     name: document.getElementById('product-name').value,
                     price: parseFloat(document.getElementById('product-price').value),
+                    
+                    // 🔴 حفظ سعر التخفيض، أو null إذا كان الحقل فارغاً
+                    discount_price: discountPriceValue ? parseFloat(discountPriceValue) : null,
+                    
                     img_path: document.getElementById('product-img').value
                 };
 
-                // افتراض: لديك جدول باسم 'products' في Supabase
                 const { error } = await supabase
                     .from('products') 
                     .insert([product]);
@@ -357,15 +353,15 @@
                 }
             });
 
-            // 10. عرض قائمة المنتجات (جديدة)
+            // 10. عرض قائمة المنتجات (مُحدَّث لعرض سعر التخفيض)
             async function loadProductsList() {
-                elements.productsListTableBody.innerHTML = '<tr><td colspan="4">جار التحميل...</td></tr>';
+                elements.productsListTableBody.innerHTML = '<tr><td colspan="5">جار التحميل...</td></tr>';
                 const { data, error } = await supabase
                     .from('products') 
                     .select('*'); 
 
                 if (error) {
-                    elements.productsListTableBody.innerHTML = `<tr><td colspan="4" style="color:red;">خطأ: ${error.message}</td></tr>`;
+                    elements.productsListTableBody.innerHTML = `<tr><td colspan="5" style="color:red;">خطأ: ${error.message}</td></tr>`;
                     return;
                 }
                 
@@ -375,46 +371,61 @@
                     row.insertCell().textContent = p.product_id;
                     row.insertCell().textContent = p.name;
                     row.insertCell().textContent = p.price;
+                    // 🔴 عرض سعر التخفيض
+                    row.insertCell().textContent = p.discount_price ? p.discount_price : '---';
                     row.insertCell().textContent = p.img_path;
                 });
             }
 
 
-            // 11. حساب الإحصائيات والمداخل (جديدة)
+            // 11. حساب الإحصائيات والمداخل (مُحدَّث لحساب السعر الفعلي للطلب)
             async function calculateStats() {
                  elements.statsMessage.style.display = 'block';
 
-                 // 🔴 ملاحظة: تحتاج إلى جلب قائمة الأسعار الحالية للمنتجات.
-                 // حاليًا نستخدم قائمة Mock مؤقتة (MOCK_PRODUCTS).
+                 // 1. جلب المنتجات لتحديد أسعارها (الأصلي والمخفض)
+                 const { data: productsData, error: productsError } = await supabase
+                    .from('products')
+                    .select('name, price, discount_price');
+                
+                 if (productsError) {
+                    elements.statsMessage.style.display = 'none';
+                    alert('فشل جلب المنتجات للإحصائيات: ' + productsError.message);
+                    return;
+                }
+                
+                // إنشاء خريطة لأسعار المنتجات لسهولة البحث
+                const productPrices = {};
+                productsData.forEach(p => {
+                    // السعر الفعلي هو المخفض إذا وُجد، وإلا فالأصلي
+                    productPrices[p.name] = p.discount_price || p.price; 
+                });
 
-                 const { data: orders, error } = await supabase
+
+                 // 2. جلب الطلبات
+                 const { data: orders, error: ordersError } = await supabase
                     .from('orders')
                     .select('product_name, quantity, status');
 
                 elements.statsMessage.style.display = 'none';
                 
-                if (error) {
-                    alert('فشل جلب الطلبات للإحصائيات: ' + error.message);
+                if (ordersError) {
+                    alert('فشل جلب الطلبات للإحصائيات: ' + ordersError.message);
                     return;
                 }
                 
                 let expectedRevenue = 0;
                 let confirmedRevenue = 0;
                 let totalOrderValue = 0;
-                let totalConfirmedOrders = 0;
 
                 orders.forEach(order => {
-                    // ابحث عن سعر المنتج (بناءً على قائمة الموك المؤقتة)
-                    let productKey = Object.keys(MOCK_PRODUCTS).find(key => MOCK_PRODUCTS[key].name === order.product_name);
-                    let price = productKey ? MOCK_PRODUCTS[productKey].price : 0; // إذا لم يوجد السعر، السعر = 0
-
+                    let price = productPrices[order.product_name] || 0; 
                     const orderValue = price * order.quantity;
+                    
                     expectedRevenue += orderValue;
                     totalOrderValue += orderValue;
 
                     if (order.status === 'تم التوصيل') {
                         confirmedRevenue += orderValue;
-                        totalConfirmedOrders++;
                     }
                 });
                 
