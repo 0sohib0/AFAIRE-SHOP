@@ -186,7 +186,10 @@ a { color: #4ade80; text-decoration: none; }
     text-align: right;
 }
 
-.order-form input, .order-form textarea {
+/* 🔴 تعديل هنا: يشمل input, textarea, و select 🔴 */
+.order-form input, 
+.order-form textarea,
+.order-form select {
     width: 100%;
     padding: 14px; /* زيادة حجم الحقل بشكل إضافي */
     border: 1px solid #444;
@@ -198,8 +201,20 @@ a { color: #4ade80; text-decoration: none; }
     text-align: right; 
     font-size: 1em; /* حجم خط أوضح داخل الحقل */
     transition: border-color 0.3s, box-shadow 0.3s;
+    
+    /* لضمان أن القائمة المنسدلة تبدو جيدة */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 10px center;
+    background-size: 14px;
 }
-.order-form input:focus, .order-form textarea:focus {
+
+.order-form input:focus, 
+.order-form textarea:focus,
+.order-form select:focus {
     border-color: #4ade80; 
     box-shadow: 0 0 8px rgba(74, 222, 128, 0.7); /* ظل أخضر واضح */
     outline: none;
@@ -264,12 +279,11 @@ a { color: #4ade80; text-decoration: none; }
         border-radius: 6px; 
     }
 
-    /* 🔴 التعديل لتقليص حجم النافذة المنبثقة على الهاتف وحل مشكلة العرض الكامل 🔴 */
     .modal-content {
         padding: 20px;
-        margin: 40px 15px; /* إضافة هامش علوي وسفلي وجانبي كبير */
+        margin: 40px 15px; /* حل مشكلة العرض الكامل */
         max-width: 90%; 
-        max-height: 90vh; /* تحديد ارتفاع أقصى */
+        max-height: 90vh; 
         overflow-y: auto;
     }
     
