@@ -1,69 +1,72 @@
-// submit-order.js
-const { createClient } = require('@supabase/supabase-js'); 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOHIB&HAMZA Store DZ</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY; 
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-module.exports = async function handler(req, res) {
+    <main class="product-grid" id="dynamic-product-grid">
+       <p id="loading-products-message" style="width:100%; text-align:center;">جاري تحميل المنتجات...</p>
+    </main>
     
-    if (!supabaseUrl || !supabaseKey) {
-        console.error("Supabase environment variables are missing.");
-        return res.status(500).json({ message: 'خطأ في إعدادات الخادم. يرجى مراجعة مفاتيح Supabase.' });
-    }
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h3 id="modal-product-title">أطلب الآن (الدفع عند الاستلام)</h3>
+            
+            <form id="orderForm" class="order-form">
+                
+                <input type="hidden" name="product" id="hidden-product-name" value=""> 
 
-    if (req.method !== 'POST') {
-        res.status(405).json({ message: 'الرجاء إرسال طلب POST.' });
-        return;
-    }
+                <label for="clientName">الاسم الكامل:</label>
+                <input type="text" id="clientName" name="client_name" required>
 
-    try {
-        const { 
-            product, 
-            client_name, 
-            phone_number, 
-            wilaya, 
-            address, 
-            quantity 
-        } = req.body;
+                <label for="clientPhone">رقم الهاتف (ضروري):</label>
+                <input type="tel" id="clientPhone" name="phone_number" required>
 
-        if (!client_name || !phone_number || !wilaya || !product) {
-            res.status(400).json({ message: 'الاسم، الهاتف، الولاية، واسم المنتج حقول مطلوبة.' });
-            return;
-        }
-        
-        const { data, error } = await supabase
-            .from('orders')
-            .insert([
-                { 
-                    product_name: product,
-                    client_name: client_name,
-                    phone_number: phone_number,
-                    wilaya: wilaya,
-                    detailed_address: address, 
-                    quantity: parseInt(quantity) || 1, 
-                    status: 'جديد' 
-                }
-            ])
-            .select('*'); 
+                <label for="clientWilaya">الولاية:</label>
+                <input type="text" id="clientWilaya" name="wilaya" required> 
+                
+                <label for="clientSize">رقم الحذاء (Pointure):</label>
+                <input type="number" id="clientSize" name="shoe_size" min="36" max="46" required>
+                <label for="clientAddress">العنوان التفصيلي (البلدية):</label>
+                <textarea id="clientAddress" name="address" required></textarea>
 
-        if (error) {
-            console.error('Supabase Insertion Error:', error);
-            res.status(500).json({ 
-                message: 'فشل في إدخال الطلب. تأكد من تطابق أسماء الأعمدة في Supabase.', 
-                details: error.message 
-            });
-            return;
-        }
+                <label for="clientQuantity">الكمية:</label>
+                <input type="number" id="clientQuantity" name="quantity" value="1" min="1" required>
 
-        res.status(200).json({ 
-            message: 'تم استلام الطلب بنجاح.', 
-            orderId: data[0].id 
-        });
+                <button type="submit">تأكيد الطلب</button>
+                <p id="submissionStatus" style="margin-top: 10px; text-align: center; display: none;"></p>
+            </form>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links-group">
+                <div class="logo-section">
+                    <span class="arrow-icon">▲</span> 
+                    <span>SOHIB&HAMZA STORE</span>
+                </div>
+                <nav class="footer-nav">
+                    <a href="#">الرئيسية</a>
+                    <a href="#">من نحن</a>
+                    <a href="#">الشروط والأحكام</a>
+                    <a href="#">سياسة الشحن والإرجاع</a>
+                </nav>
+            </div>
+        </div>
 
-    } catch (error) {
-        console.error('General Server Error:', error);
-        res.status(500).json({ message: 'خطأ داخلي في الخادم.' });
-    }
-}
+        <div class="footer-bottom">
+            <p>© 2023-2025 SOHIB&HAMZA, Inc. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script> 
+</body>
+
+</html>
