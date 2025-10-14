@@ -123,26 +123,26 @@ a { color: #4ade80; text-decoration: none; }
 }
 
 
-/* --- تنسيق النافذة المنبثقة (Modal) - تم التجميل في الخطوة السابقة --- */
+/* --- 🔴 التنسيق النهائي للنافذة المنبثقة (Modal) 🔴 --- */
 .modal-overlay {
     display: none; 
     position: fixed; 
     z-index: 1000;
     left: 0; top: 0;
     width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); 
+    background-color: rgba(0, 0, 0, 0.95); /* أغمق جداً لتركيز مطلق */
     justify-content: center;
     align-items: center;
 }
 .modal-content {
     background-color: #1a1a1a; 
     padding: 30px;
-    border: 1px solid #444; 
+    border: 1px solid #4ade80; /* حدود بلون التمييز */
     width: 90%; 
     max-width: 450px; 
     border-radius: 12px; 
     position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
     display: flex;
     flex-direction: column;
     gap: 15px; 
@@ -161,55 +161,59 @@ a { color: #4ade80; text-decoration: none; }
 
 #modal-product-title {
     color: #4ade80; 
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-align: right;
+    font-size: 1.3em; /* تكبير العنوان */
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center; /* توسيط العنوان */
     padding-bottom: 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 2px solid #333;
 }
 
-
+/* 🔴 الحل النهائي والمنظم لـ Order Form (Ponture) 🔴 */
 .order-form {
     display: flex;
     flex-direction: column; 
     gap: 15px; 
 }
 .order-form label {
-    display: block; 
-    margin-bottom: 5px; 
-    font-size: 0.95em;
+    display: flex; 
+    flex-direction: column; /* التسمية وحقل الإدخال يتتابعان عمودياً */
+    gap: 5px; 
+    margin-top: 5px;
+    font-size: 1em;
     color: #e0e0e0;
-    text-align: right;
     font-weight: 600; 
+    text-align: right;
 }
+
 .order-form input, .order-form textarea {
     width: 100%;
-    padding: 12px; 
+    padding: 14px; /* زيادة حجم الحقل بشكل إضافي */
     border: 1px solid #444;
-    border-radius: 6px; 
+    border-radius: 8px; /* حواف أكثر دائرية وواضحة */
     background-color: #000;
     color: #fff;
     box-sizing: border-box;
     direction: rtl; 
     text-align: right; 
+    font-size: 1em; /* حجم خط أوضح داخل الحقل */
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 .order-form input:focus, .order-form textarea:focus {
     border-color: #4ade80; 
-    box-shadow: 0 0 5px rgba(74, 222, 128, 0.5); 
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7); /* ظل أخضر واضح */
     outline: none;
 }
 .order-form button[type="submit"] {
-    margin-top: 25px;
-    padding: 15px; 
+    margin-top: 30px;
+    padding: 16px; 
     background-color: #f59e0b; 
     color: #1a1a1a;
     border: none;
     border-radius: 8px; 
     cursor: pointer;
-    font-weight: bold;
-    font-size: 1.1em;
+    font-weight: 900; /* خط سميك جداً */
+    font-size: 1.2em;
     transition: background-color 0.3s, transform 0.2s;
 }
 .order-form button[type="submit"]:hover { 
