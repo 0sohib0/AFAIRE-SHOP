@@ -8,18 +8,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 // ----------------------------------------------------
-// 1. وظيفة جلب وعرض المنتجات
+// 1. وظيفة جلب وعرض المنتجات (مُحدَّث لعرض سعر التخفيض)
 // ----------------------------------------------------
 async function loadProducts() {
     const grid = document.getElementById('dynamic-product-grid');
     
-    // جلب البيانات من جدول products
-    // 🔴 تأكد أن سياسات RLS لجدول 'products' تسمح بدور 'anon' بالقراءة (SELECT)
     const { data: products, error } = await supabase
         .from('products')
         .select('*');
 
-    grid.innerHTML = ''; // مسح رسالة التحميل
+    grid.innerHTML = ''; 
 
     if (error) {
         console.error('Error fetching products:', error);
@@ -34,15 +32,28 @@ async function loadProducts() {
 
     // إنشاء بطاقات المنتجات ديناميكيًا
     products.forEach((product, index) => {
-        // يمكن تغيير هذه الفئة لتحديد حجم البطاقة
         const itemClass = (index === 0 && products.length > 1) ? 'large-item' : 'small-item'; 
+        
+        let priceDisplay = '';
+        if (product.discount_price && product.discount_price < product.price) {
+            // سعر التخفيض موجود: اعرض المخفض بخط كبير والأصلي مشطوب
+            priceDisplay = `
+                <span style="color: #ccc; text-decoration: line-through; font-size: 0.8em; margin-left: 10px;">${product.price} DZD</span>
+                <span class="price" style="font-size: 1.2em;">${product.discount_price} DZD</span>
+            `;
+        } else {
+            // لا يوجد تخفيض: اعرض السعر الأصلي فقط
+            priceDisplay = `<span class="price">${product.price} DZD</span>`;
+        }
         
         const productHtml = `
             <div class="product-item ${itemClass}">
                 <img src="${product.img_path}" alt="${product.name}">
                 <div class="product-info">
                     <span>${product.name}</span>
-                    <span class="price">${product.price} DZD</span>
+                    <div style="display: flex; align-items: center; justify-content: flex-end;">
+                        ${priceDisplay}
+                    </div>
                 </div>
                 <button 
                     class="modal-open-btn" 
@@ -55,16 +66,14 @@ async function loadProducts() {
         grid.innerHTML += productHtml;
     });
 
-    // بعد تحميل المنتجات، يجب إعادة ربط أزرار "أطلب الآن" بالـ Modal
     initializeModalButtons(); 
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب (تم تعديلها لتكون دالة منفصلة)
+// 2. معالجة الـ Modal وإرسال الطلب (لم تتغير)
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
-    // 🔴 يجب أن نحدد الأزرار بعد تحميل المنتجات
     const openBtns = document.querySelectorAll('.modal-open-btn'); 
     const closeBtn = document.querySelector('.modal-close-btn');
     const form = document.getElementById('orderForm');
@@ -72,7 +81,6 @@ function initializeModalButtons() {
     const hiddenProductName = document.getElementById('hidden-product-name');
     const modalTitle = document.getElementById('modal-product-title');
 
-    // وظيفة فتح النافذة المنبثقة
     openBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const productName = btn.getAttribute('data-product-name');
@@ -84,7 +92,6 @@ function initializeModalButtons() {
         });
     });
 
-    // وظيفة إغلاق النافذة المنبثقة
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
     });
@@ -94,7 +101,6 @@ function initializeModalButtons() {
         }
     });
 
-    // معالجة إرسال النموذج (API Call)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -139,6 +145,5 @@ function initializeModalButtons() {
 // 3. نقطة البداية (Start Point)
 // ----------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
-    // البدء بتحميل المنتجات عند تحميل الصفحة
     loadProducts();
 });
