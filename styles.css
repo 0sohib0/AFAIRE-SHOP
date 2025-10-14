@@ -86,6 +86,7 @@ a { color: #ffffff; text-decoration: none; }
 
 
 /* --- تنسيق النافذة المنبثقة (Modal) لحل التداخل والتمركز --- */
+/* --- تنسيق النافذة المنبثقة (Modal) لحل التداخل والتمركز --- */
 .modal-overlay {
     display: none; 
     position: fixed; 
@@ -104,6 +105,10 @@ a { color: #ffffff; text-decoration: none; }
     max-width: 450px; 
     border-radius: 8px;
     position: relative;
+    /* 💡 الحل: استخدم Flexbox للتنسيق الداخلي */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* إضافة مسافة بين العناصر الرئيسية */
 }
 .modal-close-btn { color: #aaa; float: left; font-size: 28px; font-weight: bold; cursor: pointer; }
 
@@ -113,12 +118,14 @@ a { color: #ffffff; text-decoration: none; }
     flex-direction: column; 
     gap: 5px; 
 }
+/* إضافة تنسيق جديد لتجميع الـ Label والـ Input معاً */
 .order-form label {
     display: block; 
     margin-top: 10px;
     font-size: 0.9em;
     color: #ccc;
     text-align: right;
+    font-weight: bold; /* زيادة وضوح التسميات */
 }
 .order-form input, .order-form textarea {
     width: 100%;
@@ -131,7 +138,18 @@ a { color: #ffffff; text-decoration: none; }
     direction: rtl; /* تصحيح للإدخال العربي */
     text-align: right; 
 }
-
+.order-form button[type="submit"] {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+.order-form button[type="submit"]:hover { background-color: #0056b3; }
 
 /* --- تنسيق واجهة القدم (Footer) --- */
 .footer {
@@ -212,4 +230,5 @@ a { color: #ffffff; text-decoration: none; }
         gap: 5px;
         padding: 10px 10px;
     }
+
 }
