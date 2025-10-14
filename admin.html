@@ -19,32 +19,86 @@
     </header>
 
     <main id="admin-dashboard" style="display: none;">
-        <h2>الطلبات الجديدة وقيد المتابعة</h2>
         
-        <div class="stats-bar">
-            <span>إجمالي الطلبات: <strong id="total-orders">0</strong></span>
-            <span>طلبات جديدة: <strong id="new-orders">0</strong></span>
-        </div>
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="orders-tab">الطلبات</button>
+            <button class="tab-btn" data-tab="products-tab">إدارة المنتجات</button>
+            <button class="tab-btn" data-tab="stats-tab">الإحصائيات والمداخل</button>
+        </nav>
 
-        <table id="orders-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>المنتج</th>
-                    <th>العميل</th>
-                    <th>الهاتف</th>
-                    <th>الولاية</th>
-                    <th>العنوان التفصيلي</th>
-                    <th>الكمية</th>
-                    <th>الحالة</th>
-                    <th>الإجراء</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div id="orders-tab" class="tab-content active">
+            <h2>الطلبات الجديدة وقيد المتابعة</h2>
+            <div class="stats-bar">
+                <span>إجمالي الطلبات: <strong id="total-orders">0</strong></span>
+                <span>طلبات جديدة: <strong id="new-orders">0</strong></span>
+            </div>
+            <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>المنتج</th>
+                        <th>العميل</th>
+                        <th>الهاتف</th>
+                        <th>الولاية</th>
+                        <th>العنوان التفصيلي</th>
+                        <th>الكمية</th>
+                        <th>الحالة</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody>
                 </tbody>
-        </table>
+            </table>
+            <p id="loading-message">جار تحميل الطلبات...</p>
+        </div>
         
-        <p id="loading-message">جار تحميل الطلبات...</p>
+        <div id="products-tab" class="tab-content">
+            <h2>إضافة منتج جديد</h2>
+            <form id="product-form" class="form-grid">
+                
+                <label for="product-name">اسم المنتج:</label>
+                <input type="text" id="product-name" required>
+
+                <label for="product-id">Product ID (مثال: new-mug):</label>
+                <input type="text" id="product-id" required>
+
+                <label for="product-price">السعر (DZD):</label>
+                <input type="number" id="product-price" min="1" required>
+
+                <label for="product-img">مسار الصورة (مثال: img/new-mug.jpg):</label>
+                <input type="text" id="product-img" required>
+                
+                <button type="submit" class="submit-btn">إضافة المنتج</button>
+                <p id="product-status" style="margin-top: 10px;"></p>
+            </form>
+
+             <h3 style="margin-top: 30px;">قائمة المنتجات الحالية (لإدارتها مستقبلاً)</h3>
+            <table id="products-list-table">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>الاسم</th>
+                        <th>السعر</th>
+                        <th>صورة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+        
+        <div id="stats-tab" class="tab-content">
+            <h2>إحصائيات المبيعات والمداخل</h2>
+
+            <div class="stats-bar details-bar">
+                <span>إجمالي المداخل المتوقعة: <strong id="expected-revenue">0 DZD</strong></span>
+                <span>إجمالي المداخل المؤكدة (تم التوصيل): <strong id="confirmed-revenue">0 DZD</strong></span>
+                <span>متوسط قيمة الطلب: <strong id="avg-order-value">0 DZD</strong></span>
+            </div>
+
+            <p id="stats-message">جارِ حساب الإحصائيات...</p>
+        </div>
+        
     </main>
 
     <div id="login-modal" class="modal-overlay">
@@ -53,7 +107,7 @@
             <form id="login-form">
                 <input type="email" id="email" placeholder="البريد الإلكتروني" required>
                 <input type="password" id="password" placeholder="كلمة المرور" required>
-                <button type="submit">تسجيل الدخول</button>
+                <button type="submit" class="submit-btn">تسجيل الدخول</button>
                 <p id="auth-error" style="color: red; margin-top: 10px;"></p>
             </form>
         </div>
@@ -69,6 +123,13 @@
             // 💡 استخدام createClient المتاح عالمياً (الآن داخل DOMContentLoaded)
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
+            // تعريف منتجات وهمية لأغراض التجربة، يفضل مستقبلاً جلبها من Supabase
+            const MOCK_PRODUCTS = {
+                "acme-cup": { name: "كوب Acme", price: 4000 },
+                "acme-onesie": { name: "ملابس بيبي Acme", price: 3000 }
+            };
+
+
             const elements = {
                 loginModal: document.getElementById('login-modal'),
                 loginForm: document.getElementById('login-form'),
@@ -79,12 +140,49 @@
                 loadingMessage: document.getElementById('loading-message'),
                 totalOrders: document.getElementById('total-orders'),
                 newOrders: document.getElementById('new-orders'),
-                authError: document.getElementById('auth-error')
+                authError: document.getElementById('auth-error'),
+
+                // عناصر المنتجات والإحصائيات الجديدة
+                productForm: document.getElementById('product-form'),
+                productStatus: document.getElementById('product-status'),
+                productsListTableBody: document.querySelector('#products-list-table tbody'),
+                statsMessage: document.getElementById('stats-message'),
+                expectedRevenue: document.getElementById('expected-revenue'),
+                confirmedRevenue: document.getElementById('confirmed-revenue'),
+                avgOrderValue: document.getElementById('avg-order-value'),
+
+                // عناصر التبويبات
+                tabBtns: document.querySelectorAll('.tab-btn'),
+                tabContents: document.querySelectorAll('.tab-content')
             };
 
             const STATUSES = ['جديد', 'قيد التأكيد', 'قيد الشحن', 'تم التوصيل', 'ملغى'];
 
-            // 1. وظيفة تسجيل الدخول
+            // 0. وظيفة معالجة التبويبات (جديدة)
+            elements.tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+
+                    // إزالة 'active' من كل الأزرار والمحتوى
+                    elements.tabBtns.forEach(b => b.classList.remove('active'));
+                    elements.tabContents.forEach(c => c.classList.remove('active'));
+                    elements.tabContents.forEach(c => c.style.display = 'none');
+
+
+                    // إضافة 'active' للزر والمحتوى المستهدف
+                    btn.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                    document.getElementById(targetTab).style.display = 'block';
+
+                    // تحميل البيانات عند التحول إلى تبويبة
+                    if (targetTab === 'orders-tab') loadOrders();
+                    if (targetTab === 'stats-tab') calculateStats();
+                    if (targetTab === 'products-tab') loadProductsList();
+                });
+            });
+
+
+            // 1. وظيفة تسجيل الدخول (لم تتغير)
             elements.loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
@@ -102,7 +200,7 @@
                 }
             });
 
-            // 2. وظيفة تسجيل الخروج
+            // 2. وظيفة تسجيل الخروج (لم تتغير)
             elements.logoutBtn.addEventListener('click', async () => {
                 const { error } = await supabase.auth.signOut();
                 if (!error) {
@@ -110,12 +208,12 @@
                 }
             });
 
-            // 3. عرض شاشة تسجيل الدخول
+            // 3. عرض شاشة تسجيل الدخول (لم تتغير)
             elements.loginBtn.addEventListener('click', () => {
                 elements.loginModal.style.display = 'flex';
             });
 
-            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة
+            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة (مُعدَّل)
             async function checkAuthStatus() {
                 const { data: { session } } = await supabase.auth.getSession();
                 
@@ -124,6 +222,9 @@
                     elements.logoutBtn.style.display = 'block';
                     elements.dashboard.style.display = 'block';
                     elements.loginModal.style.display = 'none';
+                    
+                    // تأكد من عرض تبويبة الطلبات وتحميلها افتراضياً
+                    document.getElementById('orders-tab').style.display = 'block'; 
                     loadOrders();
                 } else {
                     elements.loginBtn.style.display = 'block';
@@ -134,7 +235,7 @@
                 }
             }
 
-            // 5. تحميل الطلبات من Supabase
+            // 5. تحميل الطلبات من Supabase (لم تتغير)
             async function loadOrders() {
                 elements.loadingMessage.style.display = 'block';
 
@@ -146,7 +247,6 @@
                 elements.loadingMessage.style.display = 'none';
                 
                 if (error) {
-                    // تذكر: هذا قد يكون بسبب RLS. تأكد من إعداد سياسة القراءة (Select Policy) في Supabase.
                     elements.ordersTableBody.innerHTML = `<tr><td colspan="9" style="color:red;">خطأ في جلب البيانات: ${error.message}</td></tr>`;
                     return;
                 }
@@ -154,7 +254,7 @@
                 renderOrders(data);
             }
 
-            // 6. عرض الطلبات في الجدول (التي لم تتغير)
+            // 6. عرض الطلبات في الجدول (لم تتغير)
             function renderOrders(orders) {
                 elements.ordersTableBody.innerHTML = '';
                 let newCount = 0;
@@ -193,7 +293,7 @@
                 elements.newOrders.textContent = newCount;
             }
 
-            // 7. إنشاء القائمة المنسدلة للحالة (التي لم تتغير)
+            // 7. إنشاء القائمة المنسدلة للحالة (لم تتغير)
             function createStatusSelect(currentStatus, orderId) {
                 let html = `<select class="status-select" data-order-id="${orderId}">`;
                 STATUSES.forEach(status => {
@@ -204,7 +304,7 @@
                 return html;
             }
 
-            // 8. وظيفة تحديث حالة الطلب (التي لم تتغير)
+            // 8. وظيفة تحديث حالة الطلب (لم تتغير)
             async function updateOrderStatus(orderId) {
                 const selectElement = document.querySelector(`.status-select[data-order-id="${orderId}"]`);
                 const newStatus = selectElement.value;
@@ -223,8 +323,110 @@
                 } else {
                     alert('تم تحديث الحالة بنجاح!');
                     loadOrders(); 
+                    if (document.getElementById('stats-tab').classList.contains('active')) {
+                        calculateStats(); // تحديث الإحصائيات إذا كانت التبويبة مفتوحة
+                    }
                 }
             }
+
+            // 9. إضافة منتج جديد إلى جدول (جديدة)
+            elements.productForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                elements.productStatus.textContent = '';
+                
+                const product = {
+                    product_id: document.getElementById('product-id').value,
+                    name: document.getElementById('product-name').value,
+                    price: parseFloat(document.getElementById('product-price').value),
+                    img_path: document.getElementById('product-img').value
+                };
+
+                // افتراض: لديك جدول باسم 'products' في Supabase
+                const { error } = await supabase
+                    .from('products') 
+                    .insert([product]);
+
+                if (error) {
+                    elements.productStatus.textContent = `❌ فشل إضافة المنتج: ${error.message}`;
+                    elements.productStatus.style.color = 'red';
+                } else {
+                    elements.productStatus.textContent = '✅ تم إضافة المنتج بنجاح!';
+                    elements.productStatus.style.color = 'green';
+                    elements.productForm.reset();
+                    loadProductsList();
+                }
+            });
+
+            // 10. عرض قائمة المنتجات (جديدة)
+            async function loadProductsList() {
+                elements.productsListTableBody.innerHTML = '<tr><td colspan="4">جار التحميل...</td></tr>';
+                const { data, error } = await supabase
+                    .from('products') 
+                    .select('*'); 
+
+                if (error) {
+                    elements.productsListTableBody.innerHTML = `<tr><td colspan="4" style="color:red;">خطأ: ${error.message}</td></tr>`;
+                    return;
+                }
+                
+                elements.productsListTableBody.innerHTML = '';
+                data.forEach(p => {
+                    const row = elements.productsListTableBody.insertRow();
+                    row.insertCell().textContent = p.product_id;
+                    row.insertCell().textContent = p.name;
+                    row.insertCell().textContent = p.price;
+                    row.insertCell().textContent = p.img_path;
+                });
+            }
+
+
+            // 11. حساب الإحصائيات والمداخل (جديدة)
+            async function calculateStats() {
+                 elements.statsMessage.style.display = 'block';
+
+                 // 🔴 ملاحظة: تحتاج إلى جلب قائمة الأسعار الحالية للمنتجات.
+                 // حاليًا نستخدم قائمة Mock مؤقتة (MOCK_PRODUCTS).
+
+                 const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('product_name, quantity, status');
+
+                elements.statsMessage.style.display = 'none';
+                
+                if (error) {
+                    alert('فشل جلب الطلبات للإحصائيات: ' + error.message);
+                    return;
+                }
+                
+                let expectedRevenue = 0;
+                let confirmedRevenue = 0;
+                let totalOrderValue = 0;
+                let totalConfirmedOrders = 0;
+
+                orders.forEach(order => {
+                    // ابحث عن سعر المنتج (بناءً على قائمة الموك المؤقتة)
+                    let productKey = Object.keys(MOCK_PRODUCTS).find(key => MOCK_PRODUCTS[key].name === order.product_name);
+                    let price = productKey ? MOCK_PRODUCTS[productKey].price : 0; // إذا لم يوجد السعر، السعر = 0
+
+                    const orderValue = price * order.quantity;
+                    expectedRevenue += orderValue;
+                    totalOrderValue += orderValue;
+
+                    if (order.status === 'تم التوصيل') {
+                        confirmedRevenue += orderValue;
+                        totalConfirmedOrders++;
+                    }
+                });
+                
+                const avgOrderValue = orders.length > 0 ? (totalOrderValue / orders.length).toFixed(2) : 0;
+
+
+                elements.expectedRevenue.textContent = `${expectedRevenue.toLocaleString()} DZD`;
+                elements.confirmedRevenue.textContent = `${confirmedRevenue.toLocaleString()} DZD`;
+                elements.avgOrderValue.textContent = `${avgOrderValue} DZD`;
+
+            }
+
 
             // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
             checkAuthStatus();
