@@ -18,7 +18,7 @@
             <span class="modal-close-btn">&times;</span>
             <h3 id="modal-product-title">أطلب الآن (الدفع عند الاستلام)</h3>
             
-            <form id="orderForm" class="order-form">
+           <form id="orderForm" class="order-form">
                 
                 <input type="hidden" name="product" id="hidden-product-name" value=""> 
 
@@ -33,11 +33,17 @@
                 
                 <label for="clientSize">رقم الحذاء (Pointure):</label>
                 <input type="number" id="clientSize" name="shoe_size" min="36" max="46" required>
+
                 <label for="clientAddress">العنوان التفصيلي (البلدية):</label>
                 <textarea id="clientAddress" name="address" required></textarea>
 
-                <label for="clientQuantity">الكمية:</label>
-                <input type="number" id="clientQuantity" name="quantity" value="1" min="1" required>
+                <label for="clientOffer">الكمية / العرض:</label>
+                <select id="clientOffer" name="offer_type" required>
+                    <option value="1_default">1 حذاء (بسعر عادي)</option>
+                    <option value="2_discounted">2 أحذية بـ 5000 DZD (عرض خاص)</option>
+                    <option value="3_regular">3 أحذية (بسعر عادي)</option>
+                </select>
+                <input type="hidden" name="quantity" id="hidden-quantity" value="1"> 
 
                 <button type="submit">تأكيد الطلب</button>
                 <p id="submissionStatus" style="margin-top: 10px; text-align: center; display: none;"></p>
@@ -69,3 +75,4 @@
     <script src="app.js"></script> 
 </body>
 </html>
+
