@@ -33,24 +33,23 @@
                 <span>طلبات جديدة: <strong id="new-orders">0</strong></span>
             </div>
             <table id="orders-table">
-          
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>المنتج</th>
-            <th>العميل</th>
-            <th>الهاتف</th>
-            <th>الولاية</th>
-            <th>رقم الحذاء</th> 
-            <th>العنوان التفصيلي</th>
-            <th>الكمية</th>
-            <th>الحالة</th>
-            <th>الإجراء</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>المنتج</th>
+                        <th>العميل</th>
+                        <th>الهاتف</th>
+                        <th>الولاية</th>
+                        <th>رقم الحذاء</th> 
+                        <th>العنوان التفصيلي</th>
+                        <th>الكمية</th>
+                        <th>الحالة</th>
+                        <th>الإجراء</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
             <p id="loading-message">جار تحميل الطلبات...</p>
         </div>
         
@@ -69,6 +68,7 @@
                 
                 <label for="product-discount">سعر التخفيض (DZD - اختياري):</label>
                 <input type="number" id="product-discount" min="0" placeholder="اتركه فارغاً إذا لم يكن هناك تخفيض">
+                
                 <label for="product-img">مسار الصورة (مثال: img/new-mug.jpg):</label>
                 <input type="text" id="product-img" required>
                 
@@ -119,17 +119,12 @@
     </div>
 
   <script>
-        // دالة يتم استدعاؤها فقط بعد تحميل محتوى الصفحة بالكامل
         document.addEventListener('DOMContentLoaded', () => {
 
             const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
             const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
             
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
-
-            // تم تحديث هذه القائمة لتشمل سعر التخفيض
-            const MOCK_PRODUCTS = {}; // ستعتمد الآن على البيانات المجلوبة من Supabase
-
 
             const elements = {
                 loginModal: document.getElementById('login-modal'),
@@ -143,7 +138,6 @@
                 newOrders: document.getElementById('new-orders'),
                 authError: document.getElementById('auth-error'),
 
-                // عناصر المنتجات والإحصائيات الجديدة
                 productForm: document.getElementById('product-form'),
                 productStatus: document.getElementById('product-status'),
                 productsListTableBody: document.querySelector('#products-list-table tbody'),
@@ -152,12 +146,12 @@
                 confirmedRevenue: document.getElementById('confirmed-revenue'),
                 avgOrderValue: document.getElementById('avg-order-value'),
 
-                // عناصر التبويبات
                 tabBtns: document.querySelectorAll('.tab-btn'),
                 tabContents: document.querySelectorAll('.tab-content')
             };
 
             const STATUSES = ['جديد', 'قيد التأكيد', 'قيد الشحن', 'تم التوصيل', 'ملغى'];
+            let MOCK_PRODUCTS = {}; 
 
             // 0. وظيفة معالجة التبويبات 
             elements.tabBtns.forEach(btn => {
@@ -167,7 +161,6 @@
                     elements.tabBtns.forEach(b => b.classList.remove('active'));
                     elements.tabContents.forEach(c => c.classList.remove('active'));
                     elements.tabContents.forEach(c => c.style.display = 'none');
-
 
                     btn.classList.add('active');
                     document.getElementById(targetTab).classList.add('active');
@@ -179,17 +172,13 @@
                 });
             });
 
-
-            // 1. وظيفة تسجيل الدخول 
+            // 1. وظيفة تسجيل الدخول
             elements.loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
-                
                 elements.authError.textContent = '';
-
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
-
                 if (error) {
                     elements.authError.textContent = `فشل: ${error.message}`;
                 } else {
@@ -198,7 +187,7 @@
                 }
             });
 
-            // 2. وظيفة تسجيل الخروج 
+            // 2. وظيفة تسجيل الخروج
             elements.logoutBtn.addEventListener('click', async () => {
                 const { error } = await supabase.auth.signOut();
                 if (!error) {
@@ -206,21 +195,19 @@
                 }
             });
 
-            // 3. عرض شاشة تسجيل الدخول 
+            // 3. عرض شاشة تسجيل الدخول
             elements.loginBtn.addEventListener('click', () => {
                 elements.loginModal.style.display = 'flex';
             });
 
-            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة 
+            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة
             async function checkAuthStatus() {
                 const { data: { session } } = await supabase.auth.getSession();
-                
                 if (session) {
                     elements.loginBtn.style.display = 'none';
                     elements.logoutBtn.style.display = 'block';
                     elements.dashboard.style.display = 'block';
                     elements.loginModal.style.display = 'none';
-                    
                     document.getElementById('orders-tab').style.display = 'block'; 
                     loadOrders();
                 } else {
@@ -232,33 +219,45 @@
                 }
             }
 
-            // 5. تحميل الطلبات من Supabase 
+            // 5. تحميل الطلبات من Supabase (مُحدَّث لجلب shoe_size)
             async function loadOrders() {
                 elements.loadingMessage.style.display = 'block';
-
                 const { data, error } = await supabase
                     .from('orders')
-                    .select('id, created_at, product_name, client_name, phone_number, wilaya, detailed_address, quantity, status')
+                    // جلب رقم الحذاء (shoe_size)
+                    .select('id, created_at, product_name, client_name, phone_number, wilaya, detailed_address, quantity, status, shoe_size') 
                     .order('created_at', { ascending: false });
 
                 elements.loadingMessage.style.display = 'none';
                 
                 if (error) {
-                    elements.ordersTableBody.innerHTML = `<tr><td colspan="9" style="color:red;">خطأ في جلب البيانات: ${error.message}</td></tr>`;
+                    elements.ordersTableBody.innerHTML = `<tr><td colspan="10" style="color:red;">خطأ في جلب البيانات: ${error.message}</td></tr>`;
                     return;
                 }
-
                 renderOrders(data);
             }
 
-            // 6. عرض الطلبات في الجدول 
+            // 6. عرض الطلبات في الجدول (مُحدَّث لعرض رقم الحذاء)
             function renderOrders(orders) {
                 elements.ordersTableBody.innerHTML = '';
                 let newCount = 0;
-
+                
+                // تحديث رؤوس الجدول (للتأكد من الترتيب الصحيح)
+                document.querySelector('#orders-table thead tr').innerHTML = `
+                    <th>ID</th>
+                    <th>المنتج</th>
+                    <th>العميل</th>
+                    <th>الهاتف</th>
+                    <th>الولاية</th>
+                    <th>رقم الحذاء</th> 
+                    <th>العنوان التفصيلي</th>
+                    <th>الكمية</th>
+                    <th>الحالة</th>
+                    <th>الإجراء</th>
+                `;
+                
                 orders.forEach(order => {
                     if (order.status === 'جديد') newCount++;
-
                     const row = elements.ordersTableBody.insertRow();
                     row.dataset.orderId = order.id;
 
@@ -267,9 +266,9 @@
                     row.insertCell().textContent = order.client_name;
                     row.insertCell().textContent = order.phone_number;
                     row.insertCell().textContent = order.wilaya;
+                    row.insertCell().textContent = order.shoe_size || 'N/A'; // عرض رقم الحذاء
                     row.insertCell().textContent = order.detailed_address || 'N/A';
                     row.insertCell().textContent = order.quantity;
-
 
                     const statusCell = row.insertCell();
                     statusCell.innerHTML = createStatusSelect(order.status, order.id);
@@ -286,7 +285,7 @@
                 elements.newOrders.textContent = newCount;
             }
 
-            // 7. إنشاء القائمة المنسدلة للحالة 
+            // 7. إنشاء القائمة المنسدلة للحالة (لم تتغير)
             function createStatusSelect(currentStatus, orderId) {
                 let html = `<select class="status-select" data-order-id="${orderId}">`;
                 STATUSES.forEach(status => {
@@ -297,7 +296,7 @@
                 return html;
             }
 
-            // 8. وظيفة تحديث حالة الطلب 
+            // 8. وظيفة تحديث حالة الطلب (لم تتغير)
             async function updateOrderStatus(orderId) {
                 const selectElement = document.querySelector(`.status-select[data-order-id="${orderId}"]`);
                 const newStatus = selectElement.value;
@@ -333,10 +332,8 @@
                     product_id: document.getElementById('product-id').value,
                     name: document.getElementById('product-name').value,
                     price: parseFloat(document.getElementById('product-price').value),
-                    
-                    // 🔴 حفظ سعر التخفيض، أو null إذا كان الحقل فارغاً
+                    // إرسال سعر التخفيض
                     discount_price: discountPriceValue ? parseFloat(discountPriceValue) : null,
-                    
                     img_path: document.getElementById('product-img').value
                 };
 
@@ -368,12 +365,16 @@
                 }
                 
                 elements.productsListTableBody.innerHTML = '';
+                // حفظ البيانات محلياً لحساب الإحصائيات
+                MOCK_PRODUCTS = {};
+                
                 data.forEach(p => {
+                    MOCK_PRODUCTS[p.name] = p.discount_price || p.price;
+                    
                     const row = elements.productsListTableBody.insertRow();
                     row.insertCell().textContent = p.product_id;
                     row.insertCell().textContent = p.name;
                     row.insertCell().textContent = p.price;
-                    // 🔴 عرض سعر التخفيض
                     row.insertCell().textContent = p.discount_price ? p.discount_price : '---';
                     row.insertCell().textContent = p.img_path;
                 });
@@ -384,26 +385,13 @@
             async function calculateStats() {
                  elements.statsMessage.style.display = 'block';
 
-                 // 1. جلب المنتجات لتحديد أسعارها (الأصلي والمخفض)
-                 const { data: productsData, error: productsError } = await supabase
-                    .from('products')
-                    .select('name, price, discount_price');
+                 if (Object.keys(MOCK_PRODUCTS).length === 0) {
+                     const { data: productsData } = await supabase.from('products').select('name, price, discount_price');
+                     if (productsData) {
+                         productsData.forEach(p => { MOCK_PRODUCTS[p.name] = p.discount_price || p.price; });
+                     }
+                 }
                 
-                 if (productsError) {
-                    elements.statsMessage.style.display = 'none';
-                    alert('فشل جلب المنتجات للإحصائيات: ' + productsError.message);
-                    return;
-                }
-                
-                // إنشاء خريطة لأسعار المنتجات لسهولة البحث
-                const productPrices = {};
-                productsData.forEach(p => {
-                    // السعر الفعلي هو المخفض إذا وُجد، وإلا فالأصلي
-                    productPrices[p.name] = p.discount_price || p.price; 
-                });
-
-
-                 // 2. جلب الطلبات
                  const { data: orders, error: ordersError } = await supabase
                     .from('orders')
                     .select('product_name, quantity, status');
@@ -420,7 +408,7 @@
                 let totalOrderValue = 0;
 
                 orders.forEach(order => {
-                    let price = productPrices[order.product_name] || 0; 
+                    let price = MOCK_PRODUCTS[order.product_name] || 0; 
                     const orderValue = price * order.quantity;
                     
                     expectedRevenue += orderValue;
@@ -440,12 +428,9 @@
 
             }
 
-
-            // البدء بالتحقق من حالة المصادقة عند تحميل الصفحة
             checkAuthStatus();
         });
     </script>
 </body>
 
 </html>
-
