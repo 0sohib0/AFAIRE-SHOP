@@ -3,435 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOHIB&HAMZA | لوحة التحكم</title>
-    <link rel="stylesheet" href="admin.css">
-    
+    <title>SOHIB&HAMZA Store DZ</title>
+    <link rel="stylesheet" href="styles.css"> 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-    <header>
-        <h1>لوحة تحكم SOHIB&HAMZA</h1>
-        <div id="auth-controls">
-            <button id="login-btn">تسجيل الدخول</button>
-            <button id="logout-btn" style="display: none;">تسجيل الخروج</button>
-        </div>
-    </header>
-
-    <main id="admin-dashboard" style="display: none;">
-        
-        <nav class="tabs">
-            <button class="tab-btn active" data-tab="orders-tab">الطلبات</button>
-            <button class="tab-btn" data-tab="products-tab">إدارة المنتجات</button>
-            <button class="tab-btn" data-tab="stats-tab">الإحصائيات والمداخل</button>
-        </nav>
-
-        <div id="orders-tab" class="tab-content active">
-            <h2>الطلبات الجديدة وقيد المتابعة</h2>
-            <div class="stats-bar">
-                <span>إجمالي الطلبات: <strong id="total-orders">0</strong></span>
-                <span>طلبات جديدة: <strong id="new-orders">0</strong></span>
-            </div>
-            <table id="orders-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>المنتج</th>
-                        <th>العميل</th>
-                        <th>الهاتف</th>
-                        <th>الولاية</th>
-                        <th>رقم الحذاء</th> 
-                        <th>العنوان التفصيلي</th>
-                        <th>الكمية</th>
-                        <th>الحالة</th>
-                        <th>الإجراء</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <p id="loading-message">جار تحميل الطلبات...</p>
-        </div>
-        
-        <div id="products-tab" class="tab-content">
-            <h2>إضافة منتج جديد</h2>
-            <form id="product-form" class="form-grid">
-                
-                <label for="product-name">اسم المنتج:</label>
-                <input type="text" id="product-name" required>
-
-                <label for="product-id">Product ID (مثال: new-mug):</label>
-                <input type="text" id="product-id" required>
-
-                <label for="product-price">السعر الأصلي (DZD):</label>
-                <input type="number" id="product-price" min="1" required>
-                
-                <label for="product-discount">سعر التخفيض (DZD - اختياري):</label>
-                <input type="number" id="product-discount" min="0" placeholder="اتركه فارغاً إذا لم يكن هناك تخفيض">
-                
-                <label for="product-img">مسار الصورة (مثال: img/new-mug.jpg):</label>
-                <input type="text" id="product-img" required>
-                
-                <button type="submit" class="submit-btn">إضافة المنتج</button>
-                <p id="product-status" style="margin-top: 10px;"></p>
-            </form>
-
-             <h3 style="margin-top: 30px;">قائمة المنتجات الحالية (لإدارتها مستقبلاً)</h3>
-            <table id="products-list-table">
-                <thead>
-                    <tr>
-                        <th>Product ID</th>
-                        <th>الاسم</th>
-                        <th>السعر الأصلي</th>
-                        <th>سعر التخفيض</th>
-                        <th>صورة</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
-        </div>
-        
-        <div id="stats-tab" class="tab-content">
-            <h2>إحصائيات المبيعات والمداخل</h2>
-
-            <div class="stats-bar details-bar">
-                <span>إجمالي المداخل المتوقعة: <strong id="expected-revenue">0 DZD</strong></span>
-                <span>إجمالي المداخل المؤكدة (تم التوصيل): <strong id="confirmed-revenue">0 DZD</strong></span>
-                <span>متوسط قيمة الطلب: <strong id="avg-order-value">0 DZD</strong></span>
-            </div>
-
-            <p id="stats-message">جارِ حساب الإحصائيات...</p>
-        </div>
-        
+    <main class="product-grid" id="dynamic-product-grid">
+       <p id="loading-products-message" style="width:100%; text-align:center;">جاري تحميل المنتجات...</p>
     </main>
-
-    <div id="login-modal" class="modal-overlay">
+    
+    <div id="order-modal" class="modal-overlay">
         <div class="modal-content">
-            <h3>تسجيل الدخول كمسؤول</h3>
-            <form id="login-form">
-                <input type="email" id="email" placeholder="البريد الإلكتروني" required>
-                <input type="password" id="password" placeholder="كلمة المرور" required>
-                <button type="submit" class="submit-btn">تسجيل الدخول</button>
-                <p id="auth-error" style="color: red; margin-top: 10px;"></p>
+            <span class="modal-close-btn">&times;</span>
+            <h3 id="modal-product-title">أطلب الآن (الدفع عند الاستلام)</h3>
+            
+            <form id="orderForm" class="order-form">
+                
+                <input type="hidden" name="product" id="hidden-product-name" value=""> 
+
+                <label for="clientName">الاسم الكامل:</label>
+                <input type="text" id="clientName" name="client_name" required>
+
+                <label for="clientPhone">رقم الهاتف (ضروري):</label>
+                <input type="tel" id="clientPhone" name="phone_number" required>
+
+                <label for="clientWilaya">الولاية:</label>
+                <input type="text" id="clientWilaya" name="wilaya" required> 
+                
+                <label for="clientSize">رقم الحذاء (Pointure):</label>
+                <input type="number" id="clientSize" name="shoe_size" min="36" max="46" required>
+                <label for="clientAddress">العنوان التفصيلي (البلدية):</label>
+                <textarea id="clientAddress" name="address" required></textarea>
+
+                <label for="clientQuantity">الكمية:</label>
+                <input type="number" id="clientQuantity" name="quantity" value="1" min="1" required>
+
+                <button type="submit">تأكيد الطلب</button>
+                <p id="submissionStatus" style="margin-top: 10px; text-align: center; display: none;"></p>
             </form>
         </div>
     </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links-group">
+                <div class="logo-section">
+                    <span class="arrow-icon">▲</span> 
+                    <span>SOHIB&HAMZA STORE</span>
+                </div>
+                <nav class="footer-nav">
+                    <a href="#">الرئيسية</a>
+                    <a href="#">من نحن</a>
+                    <a href="#">الشروط والأحكام</a>
+                    <a href="#">سياسة الشحن والإرجاع</a>
+                </nav>
+            </div>
+        </div>
 
-  <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        <div class="footer-bottom">
+            <p>© 2023-2025 SOHIB&HAMZA, Inc. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
 
-            const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
-            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
-            
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
-
-            const elements = {
-                loginModal: document.getElementById('login-modal'),
-                loginForm: document.getElementById('login-form'),
-                loginBtn: document.getElementById('login-btn'),
-                logoutBtn: document.getElementById('logout-btn'),
-                dashboard: document.getElementById('admin-dashboard'),
-                ordersTableBody: document.querySelector('#orders-table tbody'),
-                loadingMessage: document.getElementById('loading-message'),
-                totalOrders: document.getElementById('total-orders'),
-                newOrders: document.getElementById('new-orders'),
-                authError: document.getElementById('auth-error'),
-
-                productForm: document.getElementById('product-form'),
-                productStatus: document.getElementById('product-status'),
-                productsListTableBody: document.querySelector('#products-list-table tbody'),
-                statsMessage: document.getElementById('stats-message'),
-                expectedRevenue: document.getElementById('expected-revenue'),
-                confirmedRevenue: document.getElementById('confirmed-revenue'),
-                avgOrderValue: document.getElementById('avg-order-value'),
-
-                tabBtns: document.querySelectorAll('.tab-btn'),
-                tabContents: document.querySelectorAll('.tab-content')
-            };
-
-            const STATUSES = ['جديد', 'قيد التأكيد', 'قيد الشحن', 'تم التوصيل', 'ملغى'];
-            let MOCK_PRODUCTS = {}; // لحفظ أسعار المنتجات محلياً لحساب الإحصائيات
-
-            // 0. وظيفة معالجة التبويبات 
-            elements.tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const targetTab = btn.getAttribute('data-tab');
-
-                    elements.tabBtns.forEach(b => b.classList.remove('active'));
-                    elements.tabContents.forEach(c => c.classList.remove('active'));
-                    elements.tabContents.forEach(c => c.style.display = 'none');
-
-                    btn.classList.add('active');
-                    document.getElementById(targetTab).classList.add('active');
-                    document.getElementById(targetTab).style.display = 'block';
-
-                    if (targetTab === 'orders-tab') loadOrders();
-                    if (targetTab === 'stats-tab') calculateStats();
-                    if (targetTab === 'products-tab') loadProductsList();
-                });
-            });
-
-            // 1. وظيفة تسجيل الدخول
-            elements.loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                elements.authError.textContent = '';
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) {
-                    elements.authError.textContent = `فشل: ${error.message}`;
-                } else {
-                    elements.loginModal.style.display = 'none';
-                    checkAuthStatus();
-                }
-            });
-
-            // 2. وظيفة تسجيل الخروج
-            elements.logoutBtn.addEventListener('click', async () => {
-                const { error } = await supabase.auth.signOut();
-                if (!error) {
-                    checkAuthStatus();
-                }
-            });
-
-            // 3. عرض شاشة تسجيل الدخول
-            elements.loginBtn.addEventListener('click', () => {
-                elements.loginModal.style.display = 'flex';
-            });
-
-            // 4. عرض/إخفاء لوحة التحكم بناءً على حالة المصادقة
-            async function checkAuthStatus() {
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    elements.loginBtn.style.display = 'none';
-                    elements.logoutBtn.style.display = 'block';
-                    elements.dashboard.style.display = 'block';
-                    elements.loginModal.style.display = 'none';
-                    document.getElementById('orders-tab').style.display = 'block'; 
-                    loadOrders();
-                } else {
-                    elements.loginBtn.style.display = 'block';
-                    elements.logoutBtn.style.display = 'none';
-                    elements.dashboard.style.display = 'none';
-                    elements.ordersTableBody.innerHTML = '';
-                    elements.loadingMessage.style.display = 'none';
-                }
-            }
-
-            // 5. تحميل الطلبات من Supabase (مُحدَّث لجلب shoe_size)
-            async function loadOrders() {
-                elements.loadingMessage.style.display = 'block';
-                const { data, error } = await supabase
-                    .from('orders')
-                    .select('id, created_at, product_name, client_name, phone_number, wilaya, detailed_address, quantity, status, shoe_size') 
-                    .order('created_at', { ascending: false });
-
-                elements.loadingMessage.style.display = 'none';
-                
-                if (error) {
-                    elements.ordersTableBody.innerHTML = `<tr><td colspan="10" style="color:red;">خطأ في جلب البيانات: ${error.message}</td></tr>`;
-                    return;
-                }
-                renderOrders(data);
-            }
-
-            // 6. عرض الطلبات في الجدول (مُحدَّث لعرض رقم الحذاء)
-            function renderOrders(orders) {
-                elements.ordersTableBody.innerHTML = '';
-                let newCount = 0;
-                
-                // تحديث رؤوس الجدول
-                document.querySelector('#orders-table thead tr').innerHTML = `
-                    <th>ID</th>
-                    <th>المنتج</th>
-                    <th>العميل</th>
-                    <th>الهاتف</th>
-                    <th>الولاية</th>
-                    <th>رقم الحذاء</th> 
-                    <th>العنوان التفصيلي</th>
-                    <th>الكمية</th>
-                    <th>الحالة</th>
-                    <th>الإجراء</th>
-                `;
-                
-                orders.forEach(order => {
-                    if (order.status === 'جديد') newCount++;
-                    const row = elements.ordersTableBody.insertRow();
-                    row.dataset.orderId = order.id;
-
-                    row.insertCell().textContent = order.id;
-                    row.insertCell().textContent = order.product_name;
-                    row.insertCell().textContent = order.client_name;
-                    row.insertCell().textContent = order.phone_number;
-                    row.insertCell().textContent = order.wilaya;
-                    row.insertCell().textContent = order.shoe_size || 'N/A'; // عرض رقم الحذاء
-                    row.insertCell().textContent = order.detailed_address || 'N/A';
-                    row.insertCell().textContent = order.quantity;
-
-                    const statusCell = row.insertCell();
-                    statusCell.innerHTML = createStatusSelect(order.status, order.id);
-
-                    const actionCell = row.insertCell();
-                    const updateBtn = document.createElement('button');
-                    updateBtn.textContent = 'تحديث الحالة';
-                    updateBtn.className = 'status-update-btn';
-                    updateBtn.addEventListener('click', () => updateOrderStatus(order.id));
-                    actionCell.appendChild(updateBtn);
-                });
-
-                elements.totalOrders.textContent = orders.length;
-                elements.newOrders.textContent = newCount;
-            }
-
-            // 7. إنشاء القائمة المنسدلة للحالة (لم تتغير)
-            function createStatusSelect(currentStatus, orderId) {
-                let html = `<select class="status-select" data-order-id="${orderId}">`;
-                STATUSES.forEach(status => {
-                    const selected = status === currentStatus ? 'selected' : '';
-                    html += `<option value="${status}" ${selected}>${status}</option>`;
-                });
-                html += '</select>';
-                return html;
-            }
-
-            // 8. وظيفة تحديث حالة الطلب (لم تتغير)
-            async function updateOrderStatus(orderId) {
-                const selectElement = document.querySelector(`.status-select[data-order-id="${orderId}"]`);
-                const newStatus = selectElement.value;
-                
-                if (!confirm(`هل أنت متأكد من تغيير حالة الطلب ${orderId} إلى: ${newStatus}؟`)) {
-                    return;
-                }
-
-                const { error } = await supabase
-                    .from('orders')
-                    .update({ status: newStatus })
-                    .eq('id', orderId);
-
-                if (error) {
-                    alert('فشل تحديث الحالة: ' + error.message);
-                } else {
-                    alert('تم تحديث الحالة بنجاح!');
-                    loadOrders(); 
-                    if (document.getElementById('stats-tab').classList.contains('active')) {
-                        calculateStats(); 
-                    }
-                }
-            }
-
-            // 9. إضافة منتج جديد إلى جدول (مُحدَّث لمعالجة التخفيض)
-            elements.productForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                elements.productStatus.textContent = '';
-                
-                const discountPriceValue = document.getElementById('product-discount').value;
-
-                const product = {
-                    product_id: document.getElementById('product-id').value,
-                    name: document.getElementById('product-name').value,
-                    price: parseFloat(document.getElementById('product-price').value),
-                    discount_price: discountPriceValue ? parseFloat(discountPriceValue) : null,
-                    img_path: document.getElementById('product-img').value
-                };
-
-                const { error } = await supabase
-                    .from('products') 
-                    .insert([product]);
-
-                if (error) {
-                    elements.productStatus.textContent = `❌ فشل إضافة المنتج: ${error.message}`;
-                    elements.productStatus.style.color = 'red';
-                } else {
-                    elements.productStatus.textContent = '✅ تم إضافة المنتج بنجاح!';
-                    elements.productStatus.style.color = 'green';
-                    elements.productForm.reset();
-                    loadProductsList();
-                }
-            });
-
-            // 10. عرض قائمة المنتجات (مُحدَّث لعرض سعر التخفيض)
-            async function loadProductsList() {
-                elements.productsListTableBody.innerHTML = '<tr><td colspan="5">جار التحميل...</td></tr>';
-                const { data, error } = await supabase
-                    .from('products') 
-                    .select('*'); 
-
-                if (error) {
-                    elements.productsListTableBody.innerHTML = `<tr><td colspan="5" style="color:red;">خطأ: ${error.message}</td></tr>`;
-                    return;
-                }
-                
-                elements.productsListTableBody.innerHTML = '';
-                // حفظ البيانات محلياً لحساب الإحصائيات
-                MOCK_PRODUCTS = {};
-                
-                data.forEach(p => {
-                    // حفظ السعر الفعلي (المخفض أو الأصلي)
-                    MOCK_PRODUCTS[p.name] = p.discount_price || p.price;
-                    
-                    const row = elements.productsListTableBody.insertRow();
-                    row.insertCell().textContent = p.product_id;
-                    row.insertCell().textContent = p.name;
-                    row.insertCell().textContent = p.price;
-                    row.insertCell().textContent = p.discount_price ? p.discount_price : '---';
-                    row.insertCell().textContent = p.img_path;
-                });
-            }
-
-
-            // 11. حساب الإحصائيات والمداخل (مُحدَّث لحساب السعر الفعلي للطلب)
-            async function calculateStats() {
-                 elements.statsMessage.style.display = 'block';
-
-                 // 1. جلب المنتجات لتحديد أسعارها (الأصلي والمخفض)
-                 // سنستخدم MOCK_PRODUCTS المحفوظة بعد loadProductsList، أو نُحملها الآن:
-                 if (Object.keys(MOCK_PRODUCTS).length === 0) {
-                     const { data: productsData } = await supabase.from('products').select('name, price, discount_price');
-                     if (productsData) {
-                         productsData.forEach(p => { MOCK_PRODUCTS[p.name] = p.discount_price || p.price; });
-                     }
-                 }
-                
-                 // 2. جلب الطلبات
-                 const { data: orders, error: ordersError } = await supabase
-                    .from('orders')
-                    .select('product_name, quantity, status');
-
-                elements.statsMessage.style.display = 'none';
-                
-                if (ordersError) {
-                    alert('فشل جلب الطلبات للإحصائيات: ' + ordersError.message);
-                    return;
-                }
-                
-                let expectedRevenue = 0;
-                let confirmedRevenue = 0;
-                let totalOrderValue = 0;
-
-                orders.forEach(order => {
-                    let price = MOCK_PRODUCTS[order.product_name] || 0; 
-                    const orderValue = price * order.quantity;
-                    
-                    expectedRevenue += orderValue;
-                    totalOrderValue += orderValue;
-
-                    if (order.status === 'تم التوصيل') {
-                        confirmedRevenue += orderValue;
-                    }
-                });
-                
-                const avgOrderValue = orders.length > 0 ? (totalOrderValue / orders.length).toFixed(2) : 0;
-
-
-                elements.expectedRevenue.textContent = `${expectedRevenue.toLocaleString()} DZD`;
-                elements.confirmedRevenue.textContent = `${confirmedRevenue.toLocaleString()} DZD`;
-                elements.avgOrderValue.textContent = `${avgOrderValue} DZD`;
-
-            }
-
-            checkAuthStatus();
-        });
-    </script>
+    <script src="app.js"></script> 
 </body>
 </html>
