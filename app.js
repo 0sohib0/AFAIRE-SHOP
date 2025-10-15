@@ -1,10 +1,11 @@
 // app.js
 
-// 🔴 مفاتيح Supabase (لم تتغير)
+// 🔴 المفاتيح: يرجى التأكد من أن هذه المفاتيح كاملة ومطابقة لما في Supabase
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY8559j5wnQ';
+// يجب استبدال القيمة التالية بالمفتاح العام (anon key) الكامل والصحيح من إعدادات API في Supabase
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
 
-// إنشاء عميل Supabase (يستخدم مفتاح الـ anon)
+// إنشاء عميل Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 // ----------------------------------------------------
@@ -22,12 +23,15 @@ async function loadProducts() {
 
     if (error) {
         console.error('Error fetching products:', error);
-        grid.innerHTML = `<p style="color:red; width:100%; text-align:center;">خطأ في تحميل المنتجات: ${error.message}. تأكد من إعداد RLS بشكل صحيح.</p>`;
+        // رسالة الخطأ هنا أصبحت أوضح
+        grid.innerHTML = `<p style="color:red; width:100%; text-align:center;">
+                            خطأ في تحميل المنتجات: تأكد من صحة مفتاح API (Anon Key) وتكوين RLS لجداول القراءة (SELECT).
+                          </p>`;
         return;
     }
 
     if (products.length === 0) {
-         grid.innerHTML = `<p style="color:yellow; width:100%; text-align:center;">لا توجد منتجات متاحة حاليًا. يرجى إضافتها من لوحة التحكم.</p>`;
+         grid.innerHTML = `<p style="color:yellow; width:100%; text-align:center;">لا توجد منتجات متاحة حاليًا. يرجى إضافتها.</p>`;
          return;
     }
 
@@ -63,12 +67,11 @@ async function loadProducts() {
         grid.innerHTML += productHtml;
     });
 
-    // بعد تحميل المنتجات، يجب إعادة ربط أزرار "أطلب الآن" بالـ Modal
     initializeModalButtons(); 
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب (محدثة لإرسال رقم الحذاء)
+// 2. معالجة الـ Modal وإرسال الطلب (محدثة لإرسال رقم الحذاء والعرض)
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
@@ -96,8 +99,7 @@ function initializeModalButtons() {
 
     // تحديث حقل الكمية المخفي بناءً على خيار العرض
     clientOffer.addEventListener('change', (e) => {
-        // هنا يمكنك إضافة منطق لتحديد الكمية بناءً على قيمة العرض
-        // مثلاً: إذا كان العرض هو '2_discounted' فإن الكمية = 2
+        // تحديث الكمية بناءً على العرض المختار
         if (e.target.value === '2_discounted') {
              hiddenQuantity.value = 2;
         } else if (e.target.value === '3_regular') {
@@ -141,18 +143,18 @@ function initializeModalButtons() {
                         wilaya: data.wilaya,
                         detailed_address: data.address, 
                         quantity: parseInt(data.quantity) || 1, 
-                        // 💡 الإضافة الجديدة لرقم الحذاء:
+                        // إرسال رقم الحذاء
                         shoe_size: parseInt(data.shoe_size) || null,
-                        // 💡 إرسال نوع العرض
+                        // إرسال نوع العرض
                         offer_type: data.offer_type,
-                        // --------------------------
                         status: 'جديد' 
                     }
                 ]);
 
             if (error) {
                 console.error('Supabase Insertion Error:', error);
-                statusMessage.textContent = `❌ فشل إرسال الطلب: ${error.message}. تأكد من إعداد RLS بشكل صحيح.`;
+                // رسالة خطأ أكثر دقة للمستخدم
+                statusMessage.textContent = `❌ فشل إرسال الطلب: تأكد من إعداد RLS لـ INSERT. (${error.message})`;
                 statusMessage.style.color = 'red';
             } else {
                 statusMessage.textContent = `✅ تم استلام طلبك بنجاح! سنتصل بك خلال دقائق.`;
@@ -164,7 +166,7 @@ function initializeModalButtons() {
                 }, 3000); 
             }
         } catch (error) {
-            statusMessage.textContent = '❌ خطأ في الإرسال. يرجى المحاولة لاحقاً.';
+            statusMessage.textContent = '❌ خطأ في الشبكة أو الإرسال. يرجى المحاولة لاحقاً.';
             statusMessage.style.color = 'red';
         }
     });
