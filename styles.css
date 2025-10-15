@@ -186,7 +186,7 @@ a { color: #4ade80; text-decoration: none; }
     text-align: right;
 }
 
-/* 🔴 تعديل هنا: يشمل input, textarea, و select 🔴 */
+/* 💡 التعديل الذي يحل مشكلة الـ SELECT: إضافة عنصر SELECT */
 .order-form input, 
 .order-form textarea,
 .order-form select {
@@ -201,24 +201,27 @@ a { color: #4ade80; text-decoration: none; }
     text-align: right; 
     font-size: 1em; /* حجم خط أوضح داخل الحقل */
     transition: border-color 0.3s, box-shadow 0.3s;
-    
-    /* لضمان أن القائمة المنسدلة تبدو جيدة */
+
+    /* إزالة سهم المتصفح الافتراضي ليظهر التنسيق بشكل موحد */
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    
+    /* إضافة سهم مخصص باستخدام SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23fff' d='M9.293 12.95l.707.707L15 10l-4.293-4.293-.707.707L13.586 10l-4.293 2.95z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: left 10px center;
-    background-size: 14px;
+    background-position: left 0.7rem center;
+    background-size: 0.8em;
 }
 
-.order-form input:focus, 
-.order-form textarea:focus,
-.order-form select:focus {
+.order-form input:focus, .order-form textarea:focus, .order-form select:focus {
     border-color: #4ade80; 
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7); /* ظل أخضر واضح */
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.7); 
     outline: none;
 }
+/* نهاية التعديل الخاص بـ SELECT */
+
+
 .order-form button[type="submit"] {
     margin-top: 30px;
     padding: 16px; 
@@ -279,11 +282,12 @@ a { color: #4ade80; text-decoration: none; }
         border-radius: 6px; 
     }
 
+    /* 🔴 التعديل لتقليص حجم النافذة المنبثقة على الهاتف وحل مشكلة العرض الكامل 🔴 */
     .modal-content {
         padding: 20px;
-        margin: 40px 15px; /* حل مشكلة العرض الكامل */
+        margin: 40px 15px; /* إضافة هامش علوي وسفلي وجانبي كبير */
         max-width: 90%; 
-        max-height: 90vh; 
+        max-height: 90vh; /* تحديد ارتفاع أقصى */
         overflow-y: auto;
     }
     
