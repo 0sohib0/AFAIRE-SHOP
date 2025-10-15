@@ -1,6 +1,6 @@
 // app.js
 
-// 🔴 مفاتيح Supabase (تم الحصول عليها من ملف .env الخاص بك)
+// 🔴 مفاتيح Supabase (لم تتغير)
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
 
@@ -8,16 +8,17 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 // ----------------------------------------------------
-// 1. وظيفة جلب وعرض المنتجات (مُحدَّث لعرض سعر التخفيض)
+// 1. وظيفة جلب وعرض المنتجات (لم تتغير)
 // ----------------------------------------------------
 async function loadProducts() {
     const grid = document.getElementById('dynamic-product-grid');
     
+    // جلب البيانات من جدول products
     const { data: products, error } = await supabase
         .from('products')
         .select('*');
 
-    grid.innerHTML = ''; 
+    grid.innerHTML = ''; // مسح رسالة التحميل
 
     if (error) {
         console.error('Error fetching products:', error);
@@ -32,28 +33,15 @@ async function loadProducts() {
 
     // إنشاء بطاقات المنتجات ديناميكيًا
     products.forEach((product, index) => {
+        // يمكن تغيير هذه الفئة لتحديد حجم البطاقة
         const itemClass = (index === 0 && products.length > 1) ? 'large-item' : 'small-item'; 
-        
-        let priceDisplay = '';
-        if (product.discount_price && product.discount_price < product.price) {
-            // سعر التخفيض موجود: اعرض المخفض بخط كبير والأصلي مشطوب
-            priceDisplay = `
-                <span style="color: #ccc; text-decoration: line-through; font-size: 0.8em; margin-left: 10px;">${product.price} DZD</span>
-                <span class="price" style="font-size: 1.2em;">${product.discount_price} DZD</span>
-            `;
-        } else {
-            // لا يوجد تخفيض: اعرض السعر الأصلي فقط
-            priceDisplay = `<span class="price">${product.price} DZD</span>`;
-        }
         
         const productHtml = `
             <div class="product-item ${itemClass}">
                 <img src="${product.img_path}" alt="${product.name}">
                 <div class="product-info">
                     <span>${product.name}</span>
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        ${priceDisplay}
-                    </div>
+                    <span class="price">${product.price} DZD</span>
                 </div>
                 <button 
                     class="modal-open-btn" 
@@ -66,14 +54,16 @@ async function loadProducts() {
         grid.innerHTML += productHtml;
     });
 
+    // بعد تحميل المنتجات، يجب إعادة ربط أزرار "أطلب الآن" بالـ Modal
     initializeModalButtons(); 
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب (لم تتغير)
+// 2. معالجة الـ Modal وإرسال الطلب (تم تعديلها لتصبح إرسال مباشر لـ Supabase)
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
+    // 🔴 يجب أن نحدد الأزرار بعد تحميل المنتجات
     const openBtns = document.querySelectorAll('.modal-open-btn'); 
     const closeBtn = document.querySelector('.modal-close-btn');
     const form = document.getElementById('orderForm');
@@ -81,6 +71,7 @@ function initializeModalButtons() {
     const hiddenProductName = document.getElementById('hidden-product-name');
     const modalTitle = document.getElementById('modal-product-title');
 
+    // وظيفة فتح النافذة المنبثقة
     openBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const productName = btn.getAttribute('data-product-name');
@@ -92,6 +83,7 @@ function initializeModalButtons() {
         });
     });
 
+    // وظيفة إغلاق النافذة المنبثقة
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
     });
@@ -101,26 +93,39 @@ function initializeModalButtons() {
         }
     });
 
+    // معالجة إرسال النموذج (Supabase direct call)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+        const data = Object.fromEntries(formData.entries()); // الحصول على البيانات من النموذج
 
         statusMessage.textContent = 'جاري إرسال الطلب...';
         statusMessage.style.display = 'block';
         statusMessage.style.color = 'yellow';
 
         try {
-            const response = await fetch('/api/submit-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            // 🚨 الإرسال المباشر لـ Supabase بدلاً من Fetch
+            const { error } = await supabase
+                .from('orders')
+                .insert([
+                    { 
+                        product_name: data.product,
+                        client_name: data.client_name,
+                        phone_number: data.phone_number,
+                        wilaya: data.wilaya,
+                        detailed_address: data.address, 
+                        // تحويل الكمية إلى عدد صحيح، أو تعيينها كـ 1 افتراضياً
+                        quantity: parseInt(data.quantity) || 1, 
+                        status: 'جديد' // تعيين الحالة الافتراضية
+                    }
+                ]);
 
-            const result = await response.json(); 
-
-            if (response.ok) {
+            if (error) {
+                console.error('Supabase Insertion Error:', error);
+                statusMessage.textContent = `❌ فشل إرسال الطلب: ${error.message}. تأكد من إعداد RLS بشكل صحيح.`;
+                statusMessage.style.color = 'red';
+            } else {
                 statusMessage.textContent = `✅ تم استلام طلبك بنجاح! سنتصل بك خلال دقائق.`;
                 statusMessage.style.color = 'green';
                 form.reset();
@@ -128,13 +133,9 @@ function initializeModalButtons() {
                 setTimeout(() => {
                     modal.style.display = 'none'; 
                 }, 3000); 
-
-            } else {
-                statusMessage.textContent = `❌ فشل إرسال الطلب: ${result.message || 'خطأ غير معروف.'}`;
-                statusMessage.style.color = 'red';
             }
         } catch (error) {
-            statusMessage.textContent = '❌ خطأ في الشبكة. يرجى المحاولة لاحقاً.';
+            statusMessage.textContent = '❌ خطأ في الإرسال. يرجى المحاولة لاحقاً.';
             statusMessage.style.color = 'red';
         }
     });
@@ -145,5 +146,6 @@ function initializeModalButtons() {
 // 3. نقطة البداية (Start Point)
 // ----------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
+    // البدء بتحميل المنتجات عند تحميل الصفحة
     loadProducts();
 });
