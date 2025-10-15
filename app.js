@@ -2,13 +2,13 @@
 
 // 🔴 مفاتيح Supabase (لم تتغير)
 const SUPABASE_URL = 'https://lpvrwuwzytuqvqlmsmpv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY859j5wnQ';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwdnJ3dXd6eXR1cXZxbG1zbXB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2NDEzODQsImV4cCI6MjA3NTIxNzM4NH0.J_gc9Y1BwMOTZEhCzw8iyhZS7DcngYUVaHY8559j5wnQ';
 
 // إنشاء عميل Supabase (يستخدم مفتاح الـ anon)
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 // ----------------------------------------------------
-// 1. وظيفة جلب وعرض المنتجات (لم تتغير)
+// 1. وظيفة جلب وعرض المنتجات (محدثة لعرض التخفيض)
 // ----------------------------------------------------
 async function loadProducts() {
     const grid = document.getElementById('dynamic-product-grid');
@@ -33,7 +33,13 @@ async function loadProducts() {
 
     // إنشاء بطاقات المنتجات ديناميكيًا
     products.forEach((product, index) => {
-        // يمكن تغيير هذه الفئة لتحديد حجم البطاقة
+        // تحديد السعر للعرض (سعر التخفيض إذا وُجد، وإلا فالسعر العادي)
+        const displayPrice = product.discount_price || product.price;
+        
+        // تجهيز السعر الأصلي إذا كان هناك تخفيض
+        const originalPriceHtml = product.discount_price ? 
+            `<span class="original-price">${product.price} DZD</span>` : '';
+        
         const itemClass = (index === 0 && products.length > 1) ? 'large-item' : 'small-item'; 
         
         const productHtml = `
@@ -41,7 +47,10 @@ async function loadProducts() {
                 <img src="${product.img_path}" alt="${product.name}">
                 <div class="product-info">
                     <span>${product.name}</span>
-                    <span class="price">${product.price} DZD</span>
+                    <div class="price-container"> 
+                        <span class="price">${displayPrice} DZD</span>
+                        ${originalPriceHtml} 
+                    </div>
                 </div>
                 <button 
                     class="modal-open-btn" 
@@ -59,17 +68,19 @@ async function loadProducts() {
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب (تم تعديلها لتصبح إرسال مباشر لـ Supabase)
+// 2. معالجة الـ Modal وإرسال الطلب (محدثة لإرسال رقم الحذاء)
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
-    // 🔴 يجب أن نحدد الأزرار بعد تحميل المنتجات
     const openBtns = document.querySelectorAll('.modal-open-btn'); 
     const closeBtn = document.querySelector('.modal-close-btn');
     const form = document.getElementById('orderForm');
     const statusMessage = document.getElementById('submissionStatus');
     const hiddenProductName = document.getElementById('hidden-product-name');
     const modalTitle = document.getElementById('modal-product-title');
+    const hiddenQuantity = document.getElementById('hidden-quantity');
+    const clientOffer = document.getElementById('clientOffer');
+
 
     // وظيفة فتح النافذة المنبثقة
     openBtns.forEach(btn => {
@@ -81,6 +92,19 @@ function initializeModalButtons() {
             statusMessage.style.display = 'none'; 
             form.reset();
         });
+    });
+
+    // تحديث حقل الكمية المخفي بناءً على خيار العرض
+    clientOffer.addEventListener('change', (e) => {
+        // هنا يمكنك إضافة منطق لتحديد الكمية بناءً على قيمة العرض
+        // مثلاً: إذا كان العرض هو '2_discounted' فإن الكمية = 2
+        if (e.target.value === '2_discounted') {
+             hiddenQuantity.value = 2;
+        } else if (e.target.value === '3_regular') {
+             hiddenQuantity.value = 3;
+        } else {
+             hiddenQuantity.value = 1;
+        }
     });
 
     // وظيفة إغلاق النافذة المنبثقة
@@ -98,14 +122,15 @@ function initializeModalButtons() {
         e.preventDefault();
         
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries()); // الحصول على البيانات من النموذج
-
+        const data = Object.fromEntries(formData.entries()); 
+        
+        // إظهار رسالة الإرسال
         statusMessage.textContent = 'جاري إرسال الطلب...';
         statusMessage.style.display = 'block';
         statusMessage.style.color = 'yellow';
 
         try {
-            // 🚨 الإرسال المباشر لـ Supabase بدلاً من Fetch
+            // 🚨 الإرسال المباشر لـ Supabase
             const { error } = await supabase
                 .from('orders')
                 .insert([
@@ -115,9 +140,13 @@ function initializeModalButtons() {
                         phone_number: data.phone_number,
                         wilaya: data.wilaya,
                         detailed_address: data.address, 
-                        // تحويل الكمية إلى عدد صحيح، أو تعيينها كـ 1 افتراضياً
                         quantity: parseInt(data.quantity) || 1, 
-                        status: 'جديد' // تعيين الحالة الافتراضية
+                        // 💡 الإضافة الجديدة لرقم الحذاء:
+                        shoe_size: parseInt(data.shoe_size) || null,
+                        // 💡 إرسال نوع العرض
+                        offer_type: data.offer_type,
+                        // --------------------------
+                        status: 'جديد' 
                     }
                 ]);
 
