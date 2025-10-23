@@ -304,3 +304,28 @@ a { color: #4ade80; text-decoration: none; }
         padding: 10px 15px;
     }
 }
+
+.site-header {
+    width: 100%;
+    /* يمكنك تعيين ارتفاع ثابت أو تركه تلقائيًا بناءً على الصورة */
+    /* height: 150px; /* مثال لارتفاع ثابت */ */
+    background-color: var(--dark-bg-color); /* تأكد من تعريف هذا المتغير في CSS الخاص بك */
+    display: flex;
+    justify-content: center; /* لمركزة الصورة */
+    align-items: center;
+    padding: 10px 0; /* مسافة داخلية علوية وسفلية */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* ظل خفيف لإبراز البانر */
+}
+
+.header-banner {
+    max-width: 90%; /* تجعل الصورة متجاوبة مع عرض الشاشة */
+    height: auto; /* تحافظ على نسبة العرض إلى الارتفاع */
+    display: block; /* لإزالة أي مسافات إضافية */
+}
+
+/* في حالة وجود قائمة تنقل، ستحتاج لترتيبها مع البانر */
+/* @media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;
+    }
+} */
