@@ -9,7 +9,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 // ----------------------------------------------------
-// 1. وظيفة جلب وعرض المنتجات (محدثة لعرض التخفيض)
+// 1. وظيفة جلب وعرض المنتجات 
 // ----------------------------------------------------
 async function loadProducts() {
     const grid = document.getElementById('dynamic-product-grid');
@@ -23,9 +23,9 @@ async function loadProducts() {
 
     if (error) {
         console.error('Error fetching products:', error);
-        // رسالة الخطأ هنا أصبحت أوضح
+        // رسالة تنبيه بضرورة تفعيل سياسة SELECT
         grid.innerHTML = `<p style="color:red; width:100%; text-align:center;">
-                            خطأ في تحميل المنتجات: تأكد من صحة مفتاح API (Anon Key) وتكوين RLS لجداول القراءة (SELECT).
+                            خطأ في تحميل المنتجات: يرجى تفعيل **سياسة SELECT للدور anon** لجدول products.
                           </p>`;
         return;
     }
@@ -71,7 +71,7 @@ async function loadProducts() {
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب (محدثة لإرسال رقم الحذاء والعرض)
+// 2. معالجة الـ Modal وإرسال الطلب
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
@@ -83,7 +83,6 @@ function initializeModalButtons() {
     const modalTitle = document.getElementById('modal-product-title');
     const hiddenQuantity = document.getElementById('hidden-quantity');
     const clientOffer = document.getElementById('clientOffer');
-
 
     // وظيفة فتح النافذة المنبثقة
     openBtns.forEach(btn => {
@@ -102,8 +101,6 @@ function initializeModalButtons() {
         // تحديث الكمية بناءً على العرض المختار
         if (e.target.value === '2_discounted') {
              hiddenQuantity.value = 2;
-        } else if (e.target.value === '3_regular') {
-             hiddenQuantity.value = 3;
         } else {
              hiddenQuantity.value = 1;
         }
@@ -153,8 +150,8 @@ function initializeModalButtons() {
 
             if (error) {
                 console.error('Supabase Insertion Error:', error);
-                // رسالة خطأ أكثر دقة للمستخدم
-                statusMessage.textContent = `❌ فشل إرسال الطلب: تأكد من إعداد RLS لـ INSERT. (${error.message})`;
+                // رسالة تنبيه بضرورة تفعيل سياسة INSERT
+                statusMessage.textContent = `❌ فشل إرسال الطلب: يرجى تفعيل **سياسة INSERT للدور anon** لجدول orders. (${error.message})`;
                 statusMessage.style.color = 'red';
             } else {
                 statusMessage.textContent = `✅ تم استلام طلبك بنجاح! سنتصل بك خلال دقائق.`;
