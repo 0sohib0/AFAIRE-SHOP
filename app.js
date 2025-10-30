@@ -23,9 +23,8 @@ async function loadProducts() {
 
     if (error) {
         console.error('Error fetching products:', error);
-        // رسالة تنبيه بضرورة تفعيل سياسة SELECT
         grid.innerHTML = `<p style="color:red; width:100%; text-align:center;">
-                            خطأ في تحميل المنتجات: يرجى تفعيل **سياسة SELECT للدور anon** لجدول products.
+                            خطأ في تحميل المنتجات: تأكد من تفعيل سياسة SELECT لجدول products.
                           </p>`;
         return;
     }
@@ -71,7 +70,7 @@ async function loadProducts() {
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب
+// 2. معالجة الـ Modal وإرسال الطلب (تمت إعادة إضافة منطق المخزون الآمن)
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
@@ -83,6 +82,56 @@ function initializeModalButtons() {
     const modalTitle = document.getElementById('modal-product-title');
     const hiddenQuantity = document.getElementById('hidden-quantity');
     const clientOffer = document.getElementById('clientOffer');
+    const clientSizeInput = document.getElementById('clientSize');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    let currentProductInventory = {}; // لتخزين المخزون الحالي للمنتج المحدد
+    
+    // وظيفة جلب المخزون وتحديث حالة الزر
+    async function checkInventory(productName, size, quantity) {
+        // السماح بالتحقق فقط إذا كان رقم الحذاء والكمية مدخلين
+        if (!productName || !size || quantity < 1) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'اختر رقم الحذاء أولاً';
+            return;
+        }
+
+        // 1. جلب المخزون الحالي للمنتج من Supabase
+        const { data, error } = await supabase
+            .from('products')
+            .select('inventory_json')
+            .eq('name', productName)
+            .single();
+
+        if (error || !data || !data.inventory_json) {
+            console.error('Failed to fetch inventory:', error);
+            // في حالة الخطأ، نعتبر المخزون متاحًا ونعتمد على الزناد لمنع تكرار الطلب على الخادم
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'تأكيد الطلب';
+            statusMessage.style.display = 'none';
+            return;
+        }
+
+        currentProductInventory = data.inventory_json;
+        
+        // 2. التحقق من المخزون للقياس المحدد
+        const requiredQuantity = parseInt(quantity);
+        // قراءة المخزون من الـ JSONB، القيمة الافتراضية هي صفر
+        const availableStock = currentProductInventory[String(size)] || 0; 
+
+        if (availableStock < requiredQuantity) {
+            statusMessage.textContent = `❌ نفد المخزون للقياس رقم ${size}. المخزون المتاح: ${availableStock}`;
+            statusMessage.style.display = 'block';
+            statusMessage.style.color = '#ef4444'; // أحمر
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'نفد المخزون';
+        } else {
+            statusMessage.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'تأكيد الطلب';
+        }
+    }
+
 
     // وظيفة فتح النافذة المنبثقة
     openBtns.forEach(btn => {
@@ -93,10 +142,20 @@ function initializeModalButtons() {
             modal.style.display = 'flex'; 
             statusMessage.style.display = 'none'; 
             form.reset();
+            currentProductInventory = {}; // مسح المخزون السابق
+            submitBtn.disabled = true; // إغلاق الزر حتى يتم اختيار رقم الحذاء
+            submitBtn.textContent = 'اختر رقم الحذاء أولاً';
         });
     });
 
-    // تحديث حقل الكمية المخفي بناءً على خيار العرض
+    // مراقبة التغييرات في الحقول التي تؤثر على المخزون
+    const inventoryChangeHandler = () => {
+        const productName = hiddenProductName.value;
+        const size = clientSizeInput.value;
+        const quantity = hiddenQuantity.value;
+        checkInventory(productName, size, quantity);
+    };
+
     clientOffer.addEventListener('change', (e) => {
         // تحديث الكمية بناءً على العرض المختار
         if (e.target.value === '2_discounted') {
@@ -104,9 +163,13 @@ function initializeModalButtons() {
         } else {
              hiddenQuantity.value = 1;
         }
+        inventoryChangeHandler();
     });
 
-    // وظيفة إغلاق النافذة المنبثقة
+    clientSizeInput.addEventListener('input', inventoryChangeHandler);
+
+
+    // وظيفة إغلاق النافذة المنبثقة (بدون تغيير)
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
     });
@@ -116,12 +179,24 @@ function initializeModalButtons() {
         }
     });
 
-    // معالجة إرسال النموذج (Supabase direct call)
+    // 🔴 معالجة إرسال النموذج 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries()); 
+        
+        // إعادة التحقق السريع في الواجهة قبل الإرسال
+        const requiredQuantity = parseInt(data.quantity) || 1;
+        const selectedSize = parseInt(data.shoe_size) || null;
+        const availableStock = currentProductInventory[String(selectedSize)] || 0;
+
+        if (availableStock < requiredQuantity) {
+             statusMessage.textContent = `❌ فشل الإرسال! المخزون غير كافٍ.`;
+             statusMessage.style.color = 'red';
+             submitBtn.disabled = true;
+             return;
+        }
         
         // إظهار رسالة الإرسال
         statusMessage.textContent = 'جاري إرسال الطلب...';
@@ -129,8 +204,8 @@ function initializeModalButtons() {
         statusMessage.style.color = 'yellow';
 
         try {
-            // 🚨 الإرسال المباشر لـ Supabase
-            const { error } = await supabase
+            // 🚨 الإرسال المباشر لـ Supabase (الزناد سيقوم بالخصم بعد هذا الإرسال)
+            const { error: insertError } = await supabase
                 .from('orders')
                 .insert([
                     { 
@@ -139,25 +214,26 @@ function initializeModalButtons() {
                         phone_number: data.phone_number,
                         wilaya: data.wilaya,
                         detailed_address: data.address, 
-                        quantity: parseInt(data.quantity) || 1, 
-                        // إرسال رقم الحذاء
-                        shoe_size: parseInt(data.shoe_size) || null,
-                        // إرسال نوع العرض
+                        quantity: requiredQuantity, 
+                        shoe_size: selectedSize,
                         offer_type: data.offer_type,
                         status: 'جديد' 
                     }
                 ]);
 
-            if (error) {
-                console.error('Supabase Insertion Error:', error);
-                // رسالة تنبيه بضرورة تفعيل سياسة INSERT
-                statusMessage.textContent = `❌ فشل إرسال الطلب: يرجى تفعيل **سياسة INSERT للدور anon** لجدول orders. (${error.message})`;
+            if (insertError) {
+                console.error('Supabase Insertion Error:', insertError);
+                statusMessage.textContent = `❌ فشل إرسال الطلب: (${insertError.message})`;
                 statusMessage.style.color = 'red';
             } else {
+                // ✅ النجاح: هنا سيقوم الزناد بخصم المخزون على الخادم
                 statusMessage.textContent = `✅ تم استلام طلبك بنجاح! سنتصل بك خلال دقائق.`;
                 statusMessage.style.color = 'green';
                 form.reset();
                 
+                // تحديث المخزون في الواجهة بعد الإرسال لإغلاق الزر إذا نفد المخزون
+                checkInventory(data.product, selectedSize, 1); 
+
                 setTimeout(() => {
                     modal.style.display = 'none'; 
                 }, 3000); 
