@@ -68,6 +68,15 @@
                 
                 <label for="product-discount">سعر التخفيض (DZD - اختياري):</label>
                 <input type="number" id="product-discount" min="0" placeholder="اتركه فارغاً إذا لم يكن هناك تخفيض">
+
+                <label for="product-img">مسار الصورة (مثال: img/new-mug.jpg):</label>
+<input type="text" id="product-img" required>
+
+<label for="product-inventory">المخزون لكل رقم حذاء (JSON):</label>
+<textarea id="product-inventory" rows="4" placeholder='مثال: {"37": 10, "38": 5, "39": 20}' required></textarea>
+                
+<button type="submit" class="submit-btn">إضافة المنتج</button>
+<p id="product-status" style="margin-top: 10px;"></p>
                 
                 <label for="product-img">مسار الصورة (مثال: img/new-mug.jpg):</label>
                 <input type="text" id="product-img" required>
@@ -434,4 +443,5 @@
 </body>
 
 </html>
+
 
