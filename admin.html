@@ -225,7 +225,6 @@
             // 5. تحميل الطلبات من Supabase 
             async function loadOrders() {
                 elements.loadingMessage.style.display = 'block';
-                // 🔴 تنبيه: تحتاج إلى سياسة SELECT لجدول orders للدور authenticated
                 const { data, error } = await supabase
                     .from('orders')
                     .select('id, created_at, product_name, client_name, phone_number, wilaya, detailed_address, quantity, status, shoe_size') 
@@ -308,7 +307,6 @@
                     return;
                 }
 
-                // 🔴 تنبيه: تحتاج إلى سياسة UPDATE لجدول orders للدور authenticated
                 const { error } = await supabase
                     .from('orders')
                     .update({ status: newStatus })
@@ -331,12 +329,10 @@
                 elements.productStatus.textContent = '';
                 
                 const discountPriceValue = document.getElementById('product-discount').value;
-                // 💡 جلب نص المخزون من الحقل الجديد
                 const inventoryJsonString = document.getElementById('product-inventory').value;
 
                 let inventoryObject;
                 try {
-                    // محاولة تحليل (Parse) نص المخزون ككائن JSON
                     inventoryObject = JSON.parse(inventoryJsonString);
                 } catch (err) {
                     elements.productStatus.textContent = `❌ فشل إضافة المنتج: صيغة المخزون غير صحيحة (يجب أن تكون JSON).`;
@@ -350,11 +346,9 @@
                     price: parseFloat(document.getElementById('product-price').value),
                     discount_price: discountPriceValue ? parseFloat(discountPriceValue) : null,
                     img_path: document.getElementById('product-img').value,
-                    // 💡 إضافة المخزون إلى البيانات
                     inventory_json: inventoryObject 
                 };
 
-                // 🔴 تنبيه: تحتاج إلى سياسة INSERT لجدول products للدور authenticated
                 const { error } = await supabase
                     .from('products') 
                     .insert([product]);
@@ -370,10 +364,9 @@
                 }
             });
 
-            // 10. عرض قائمة المنتجات (مُحدَّث لعرض سعر التخفيض)
+            // 10. عرض قائمة المنتجات (مُصحح لعرض product_id الحقيقي)
             async function loadProductsList() {
                 elements.productsListTableBody.innerHTML = '<tr><td colspan="5">جار التحميل...</td></tr>';
-                 // 🔴 تنبيه: تحتاج إلى سياسة SELECT لجدول products للدور authenticated
                 const { data, error } = await supabase
                     .from('products') 
                     .select('*'); 
@@ -384,14 +377,16 @@
                 }
                 
                 elements.productsListTableBody.innerHTML = '';
-                // حفظ البيانات محلياً لحساب الإحصائيات
                 MOCK_PRODUCTS = {};
                 
                 data.forEach(p => {
                     MOCK_PRODUCTS[p.name] = p.discount_price || p.price;
                     
                     const row = elements.productsListTableBody.insertRow();
-                    row.insertCell().textContent = p.product_id;
+                    
+                    // 💡 التصحيح: استخدام product_id الفعلي
+                    row.insertCell().textContent = p.product_id; 
+                    
                     row.insertCell().textContent = p.name;
                     row.insertCell().textContent = p.price;
                     row.insertCell().textContent = p.discount_price ? p.discount_price : '---';
@@ -400,12 +395,11 @@
             }
 
 
-            // 11. حساب الإحصائيات والمداخل (🔴 تم تبسيطها مؤقتاً لضمان عمل الصفحة)
+            // 11. حساب الإحصائيات والمداخل (تم تبسيطها لضمان عمل الصفحة)
             async function calculateStats() {
                  elements.statsMessage.style.display = 'block';
                  elements.statsMessage.textContent = 'تعذر حساب الإحصائيات المالية: يرجى التأكد من تفعيل سياسة SELECT لجميع الجداول الضرورية في Supabase.';
                  
-                 // تعطيل عرض الإحصائيات المالية مؤقتاً
                  elements.expectedRevenue.textContent = `---`;
                  elements.confirmedRevenue.textContent = `---`;
                  elements.avgOrderValue.textContent = `---`;
