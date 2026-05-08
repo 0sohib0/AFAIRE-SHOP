@@ -3,108 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AFIRE SHOPE DZ</title>
+    <title>SOHIB&HAMZA | متجر الساعات الفاخرة</title>
     <link rel="stylesheet" href="styles.css"> 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<header class="site-header">
-        <img src="charit.png" alt="AFAIRE SHOP DZ Banner" class="header-banner">
-        </header>
+    <header class="site-header">
+        <img src="charit.png" alt="SOHIB&HAMZA STORE Banner" class="header-banner">
+    </header>
+
     <main class="product-grid" id="dynamic-product-grid">
-       <p id="loading-products-message" style="width:100%; text-align:center;">جاري تحميل المنتجات...</p>
+       <p id="loading-products-message" style="width:100%; text-align:center;">جاري تحميل أحدث الساعات...</p>
     </main>
     
     <div id="order-modal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
-            <h3 id="modal-product-title">أطلب الآن (الدفع عند الاستلام)</h3>
+            <h3 id="modal-product-title">أطلب ساعتك الآن (الدفع عند الاستلام)</h3>
             
            <form id="orderForm" class="order-form">
-                
                 <input type="hidden" name="product" id="hidden-product-name" value=""> 
 
                 <label for="clientName">الاسم الكامل:</label>
-                <input type="text" id="clientName" name="client_name" required>
+                <input type="text" id="clientName" name="client_name" required placeholder="أدخل اسمك الكامل">
 
-                <label for="clientPhone">رقم الهاتف (ضروري):</label>
-                <input type="tel" id="clientPhone" name="phone_number" required>
+                <label for="clientPhone">رقم الهاتف:</label>
+                <input type="tel" id="clientPhone" name="phone_number" required placeholder="05/06/07XXXXXXXX">
 
-              <label for="clientWilaya">الولاية:</label>
-<select id="clientWilaya" name="wilaya" required>
-    <option value="" disabled selected>--- اختر ولايتك ---</option>
-    <option value="أدرار">01 - أدرار</option>
-    <option value="الشلف">02 - الشلف</option>
-    <option value="الأغواط">03 - الأغواط</option>
-    <option value="أم البواقي">04 - أم البواقي</option>
-    <option value="باتنة">05 - باتنة</option>
-    <option value="بجاية">06 - بجاية</option>
-    <option value="بسكرة">07 - بسكرة</option>
-    <option value="بشار">08 - بشار</option>
-    <option value="البليدة">09 - البليدة</option>
-    <option value="البويرة">10 - البويرة</option>
-    <option value="تمنراست">11 - تمنراست</option>
-    <option value="تبسة">12 - تبسة</option>
-    <option value="تلمسان">13 - تلمسان</option>
-    <option value="تيارت">14 - تيارت</option>
-    <option value="تيزي وزو">15 - تيزي وزو</option>
-    <option value="الجزائر">16 - الجزائر</option>
-    <option value="الجلفة">17 - الجلفة</option>
-    <option value="جيجل">18 - جيجل</option>
-    <option value="سطيف">19 - سطيف</option>
-    <option value="سعيدة">20 - سعيدة</option>
-    <option value="سكيكدة">21 - سكيكدة</option>
-    <option value="سيدي بلعباس">22 - سيدي بلعباس</option>
-    <option value="عنابة">23 - عنابة</option>
-    <option value="قالمة">24 - قالمة</option>
-    <option value="قسنطينة">25 - قسنطينة</option>
-    <option value="المدية">26 - المدية</option>
-    <option value="مستغانم">27 - مستغانم</option>
-    <option value="المسيلة">28 - المسيلة</option>
-    <option value="معسكر">29 - معسكر</option>
-    <option value="ورقلة">30 - ورقلة</option>
-    <option value="وهران">31 - وهران</option>
-    <option value="البيض">32 - البيض</option>
-    <option value="إليزي">33 - إليزي</option>
-    <option value="برج بوعريريج">34 - برج بوعريريج</option>
-    <option value="بومرداس">35 - بومرداس</option>
-    <option value="الطارف">36 - الطارف</option>
-    <option value="تندوف">37 - تندوف</option>
-    <option value="تيسمسيلت">38 - تيسمسيلت</option>
-    <option value="الوادي">39 - الوادي</option>
-    <option value="خنشلة">40 - خنشلة</option>
-    <option value="سوق أهراس">41 - سوق أهراس</option>
-    <option value="تيبازة">42 - تيبازة</option>
-    <option value="ميلة">43 - ميلة</option>
-    <option value="عين الدفلى">44 - عين الدفلى</option>
-    <option value="النعامة">45 - النعامة</option>
-    <option value="عين تموشنت">46 - عين تموشنت</option>
-    <option value="غرداية">47 - غرداية</option>
-    <option value="غليزان">48 - غليزان</option>
-    <option value="تيميمون">49 - تيميمون</option>
-    <option value="برج باجي مختار">50 - برج باجي مختار</option>
-    <option value="أولاد جلال">51 - أولاد جلال</option>
-    <option value="بني عباس">52 - بني عباس</option>
-    <option value="عين صالح">53 - عين صالح</option>
-    <option value="عين قزام">54 - عين قزام</option>
-    <option value="تقرت">55 - تقرت</option>
-    <option value="جانت">56 - جانت</option>
-    <option value="المغير">57 - المغير</option>
-    <option value="المنيعة">58 - المنيعة</option>
-</select>
+                <label for="clientWilaya">الولاية:</label>
+                <select id="clientWilaya" name="wilaya" required>
+                    <option value="" disabled selected>--- اختر ولايتك ---</option>
+                    <option value="أدرار">01 - أدرار</option>
+                    <option value="الشلف">02 - الشلف</option>
+                    <option value="الأغواط">03 - الأغواط</option>
+                    <option value="أم البواقي">04 - أم البواقي</option>
+                    <option value="باتنة">05 - باتنة</option>
+                    <option value="بجاية">06 - بجاية</option>
+                    <option value="بسكرة">07 - بسكرة</option>
+                    <option value="بشار">08 - بشار</option>
+                    <option value="البليدة">09 - البليدة</option>
+                    <option value="البويرة">10 - البويرة</option>
+                    <option value="تمنراست">11 - تمنراست</option>
+                    <option value="تبسة">12 - تبسة</option>
+                    <option value="تلمسان">13 - تلمسان</option>
+                    <option value="تيارت">14 - تيارت</option>
+                    <option value="تيزي وزو">15 - تيزي وزو</option>
+                    <option value="الجزائر">16 - الجزائر</option>
+                    <option value="الجلفة">17 - الجلفة</option>
+                    <option value="جيجل">18 - جيجل</option>
+                    <option value="سطيف">19 - سطيف</option>
+                    <option value="سعيدة">20 - سعيدة</option>
+                    <option value="سكيكدة">21 - سكيكدة</option>
+                    <option value="سيدي بلعباس">22 - سيدي بلعباس</option>
+                    <option value="عنابة">23 - عنابة</option>
+                    <option value="قالمة">24 - قالمة</option>
+                    <option value="قسنطينة">25 - قسنطينة</option>
+                    <option value="المدية">26 - المدية</option>
+                    <option value="مستغانم">27 - مستغانم</option>
+                    <option value="المسيلة">28 - المسيلة</option>
+                    <option value="معسكر">29 - معسكر</option>
+                    <option value="ورقلة">30 - ورقلة</option>
+                    <option value="وهران">31 - وهران</option>
+                    <option value="البيض">32 - البيض</option>
+                    <option value="إليزي">33 - إليزي</option>
+                    <option value="برج بوعريريج">34 - برج بوعريريج</option>
+                    <option value="بومرداس">35 - بومرداس</option>
+                    <option value="الطارف">36 - الطارف</option>
+                    <option value="تندوف">37 - تندوف</option>
+                    <option value="تيسمسيلت">38 - تيسمسيلت</option>
+                    <option value="الوادي">39 - الوادي</option>
+                    <option value="خنشلة">40 - خنشلة</option>
+                    <option value="سوق أهراس">41 - سوق أهراس</option>
+                    <option value="تيبازة">42 - تيبازة</option>
+                    <option value="ميلة">43 - ميلة</option>
+                    <option value="عين الدفلى">44 - عين الدفلى</option>
+                    <option value="النعامة">45 - النعامة</option>
+                    <option value="عين تموشنت">46 - عين تموشنت</option>
+                    <option value="غرداية">47 - غرداية</option>
+                    <option value="غليزان">48 - غليزان</option>
+                    <option value="تيميمون">49 - تيميمون</option>
+                    <option value="برج باجي مختار">50 - برج باجي مختار</option>
+                    <option value="أولاد جلال">51 - أولاد جلال</option>
+                    <option value="بني عباس">52 - بني عباس</option>
+                    <option value="عين صالح">53 - عين صالح</option>
+                    <option value="عين قزام">54 - عين قزام</option>
+                    <option value="تقرت">55 - تقرت</option>
+                    <option value="جانت">56 - جانت</option>
+                    <option value="المغير">57 - المغير</option>
+                    <option value="المنيعة">58 - المنيعة</option>
+                </select>
                 
-                <label for="clientSize">رقم الحذاء (Pointure):</label>
-                <input type="number" id="clientSize" name="shoe_size" min="36" max="40" required>
-
-                <label for="clientAddress">العنوان التفصيلي (البلدية) او مكتب التوصيل:</label>
-                <textarea id="clientAddress" name="address" required></textarea>
+                <label for="clientAddress">العنوان التفصيلي (البلدية) أو مكتب التوصيل:</label>
+                <textarea id="clientAddress" name="address" required placeholder="أدخل بلدية السكن أو عنوان مكتب Yalidine/ZR"></textarea>
 
                 <label for="clientOffer">الكمية / العرض:</label>
                 <select id="clientOffer" name="offer_type" required>
-                    <option value="1_default">1 حذاء (بسعر عادي)</option>
-                    <option value="2_discounted">2 أحذية بـ 5000 DZD (عرض خاص)</option>
-                   
+                    <option value="1_default">1 ساعة (السعر العادي)</option>
+                    <option value="2_discounted">ساعتين (عرض التخفيض)</option>
                 </select>
+                
                 <input type="hidden" name="quantity" id="hidden-quantity" value="1"> 
 
                 <button type="submit">تأكيد الطلب</button>
@@ -118,7 +115,7 @@
             <div class="footer-links-group">
                 <div class="logo-section">
                     <span class="arrow-icon">▲</span> 
-                    <span>AFIRE SHOPE DZ</span>
+                    <span>SOHIB&HAMZA STORE</span>
                 </div>
                 <nav class="footer-nav">
                     <a href="#">الرئيسية</a>
@@ -130,17 +127,10 @@
         </div>
 
         <div class="footer-bottom">
-            <p>© 2023-2025 AFIRE SHOPE DZ, Inc. جميع الحقوق محفوظة.</p>
+            <p>© 2023-2026 SOHIB&HAMZA STORE, Inc. جميع الحقوق محفوظة.</p>
         </div>
     </footer>
 
     <script src="app.js"></script> 
 </body>
 </html>
-
-
-
-
-
-
-
