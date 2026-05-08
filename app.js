@@ -4,7 +4,7 @@
 const SUPABASE_URL = 'https://lthjvfhaawxgvndobjhg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0aGp2ZmhhYXd4Z3ZuZG9iamhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjY1NjIsImV4cCI6MjA5MzgwMjU2Mn0.pj3XRLAHUxspTQzyEQ0xnGTc5jtl7VbjDY-b894hCew';
 
-// إنشاء عميل Supabase
+// تعريف Supabase مرة واحدة فقط
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 // ----------------------------------------------------
@@ -13,7 +13,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function loadProducts() {
     const grid = document.getElementById('dynamic-product-grid');
     
-    // جلب البيانات من جدول products
     const { data: products, error } = await supabase
         .from('products')
         .select('*');
@@ -33,15 +32,9 @@ async function loadProducts() {
          return;
     }
 
-    // إنشاء بطاقات المنتجات ديناميكيًا
     products.forEach((product, index) => {
-        // تحديد السعر للعرض (سعر التخفيض إذا وُجد، وإلا فالسعر العادي)
         const displayPrice = product.discount_price || product.price;
-        
-        // تجهيز السعر الأصلي إذا كان هناك تخفيض
-        const originalPriceHtml = product.discount_price ? 
-            `<span class="original-price">${product.price} DZD</span>` : '';
-        
+        const originalPriceHtml = product.discount_price ? `<span class="original-price">${product.price} DZD</span>` : '';
         const itemClass = (index === 0 && products.length > 1) ? 'large-item' : 'small-item'; 
         
         const productHtml = `
@@ -69,7 +62,7 @@ async function loadProducts() {
 }
 
 // ----------------------------------------------------
-// 2. معالجة الـ Modal وإرسال الطلب (محدثة للمخزون الإجمالي)
+// 2. معالجة الـ Modal وإرسال الطلب
 // ----------------------------------------------------
 function initializeModalButtons() {
     const modal = document.getElementById('order-modal');
@@ -83,16 +76,14 @@ function initializeModalButtons() {
     const clientOffer = document.getElementById('clientOffer');
     const submitBtn = form.querySelector('button[type="submit"]');
 
-    let currentProductInventory = {}; // لتخزين المخزون الحالي
+    let currentProductInventory = {}; 
     
-    // وظيفة جلب المخزون وتحديث حالة الزر (معدلة للساعات)
     async function checkInventory(productName, quantity) {
         if (!productName || quantity < 1) {
             submitBtn.disabled = true;
             return;
         }
 
-        // جلب المخزون الحالي للمنتج من Supabase
         const { data, error } = await supabase
             .from('products')
             .select('inventory_json')
@@ -100,7 +91,6 @@ function initializeModalButtons() {
             .single();
 
         if (error || !data || !data.inventory_json) {
-            console.error('Failed to fetch inventory:', error);
             submitBtn.disabled = false;
             submitBtn.textContent = 'تأكيد الطلب';
             statusMessage.style.display = 'none';
@@ -108,9 +98,7 @@ function initializeModalButtons() {
         }
 
         currentProductInventory = data.inventory_json;
-        
         const requiredQuantity = parseInt(quantity);
-        // قراءة المخزون الإجمالي "total"
         const availableStock = currentProductInventory["total"] || 0; 
 
         if (availableStock < requiredQuantity) {
@@ -126,8 +114,6 @@ function initializeModalButtons() {
         }
     }
 
-
-    // وظيفة فتح النافذة المنبثقة
     openBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const productName = btn.getAttribute('data-product-name');
@@ -136,15 +122,12 @@ function initializeModalButtons() {
             modal.style.display = 'flex'; 
             statusMessage.style.display = 'none'; 
             form.reset();
-            hiddenQuantity.value = 1; // إعادة تعيين الكمية للوضع الافتراضي
+            hiddenQuantity.value = 1; 
             currentProductInventory = {}; 
-            
-            // التحقق من المخزون فور فتح النافذة
             checkInventory(productName, 1);
         });
     });
 
-    // مراقبة التغييرات في العرض (الكمية)
     clientOffer.addEventListener('change', (e) => {
         if (e.target.value === '2_discounted') {
              hiddenQuantity.value = 2;
@@ -154,7 +137,6 @@ function initializeModalButtons() {
         checkInventory(hiddenProductName.value, hiddenQuantity.value);
     });
 
-    // إغلاق النافذة
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
     });
@@ -164,7 +146,6 @@ function initializeModalButtons() {
         }
     });
 
-    // 🔴 معالجة إرسال النموذج 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -186,7 +167,6 @@ function initializeModalButtons() {
         statusMessage.style.color = 'yellow';
 
         try {
-            // الإرسال المباشر لـ Supabase
             const { error: insertError } = await supabase
                 .from('orders')
                 .insert([
