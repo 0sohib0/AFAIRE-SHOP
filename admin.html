@@ -286,6 +286,61 @@
 
             checkAuthStatus();
         });
+        // 12. حساب الإحصائيات والمداخل (مُفعلة بالكامل)
+            async function calculateStats() {
+                elements.statsMessage.style.display = 'block';
+                elements.statsMessage.textContent = 'جارِ حساب الإحصائيات...';
+
+                // جلب الطلبات من قاعدة البيانات
+                const { data: orders, error: ordersError } = await supabase.from('orders').select('*');
+                
+                // جلب المنتجات لمعرفة الأسعار
+                const { data: products, error: productsError } = await supabase.from('products').select('name, price, discount_price');
+
+                if (ordersError || productsError) {
+                    elements.statsMessage.textContent = '❌ تعذر جلب البيانات لحساب الإحصائيات.';
+                    return;
+                }
+
+                // إنشاء قاموس للأسعار (نستعمل سعر التخفيض إذا وجد، وإلا السعر الأصلي)
+                const priceMap = {};
+                products.forEach(p => {
+                    priceMap[p.name] = p.discount_price || p.price;
+                });
+
+                let expectedTotal = 0; // المداخيل المتوقعة
+                let confirmedTotal = 0; // المداخيل المؤكدة
+                let confirmedCount = 0; // عدد الطلبات المؤكدة
+
+                orders.forEach(order => {
+                    if (order.status === 'ملغى') return; // لا نحسب الطلبات الملغاة
+
+                    // نجيبو سعر الحبة الواحدة تاع هاد المنتج
+                    const unitPrice = priceMap[order.product_name] || 0;
+                    
+                    // حساب السعر الإجمالي للطلب (السعر × الكمية)
+                    let orderTotal = unitPrice * order.quantity;
+
+                    expectedTotal += orderTotal;
+
+                    // إذا كانت الحالة "تم التوصيل"، نحسبوها في المداخيل المؤكدة
+                    if (order.status === 'تم التوصيل') {
+                        confirmedTotal += orderTotal;
+                        confirmedCount++;
+                    }
+                });
+
+                // حساب متوسط قيمة الطلب
+                const avgOrder = confirmedCount > 0 ? (confirmedTotal / confirmedCount) : 0;
+
+                // عرض الأرقام في الشاشة
+                elements.expectedRevenue.textContent = expectedTotal.toLocaleString() + ' DZD';
+                elements.confirmedRevenue.textContent = confirmedTotal.toLocaleString() + ' DZD';
+                elements.avgOrderValue.textContent = Math.round(avgOrder).toLocaleString() + ' DZD';
+
+                // إخفاء رسالة التحميل
+                elements.statsMessage.style.display = 'none'; 
+            }
     </script>
 </body>
 </html>
